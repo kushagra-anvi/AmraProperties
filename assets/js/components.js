@@ -36,7 +36,7 @@ const components = {
     <nav class="fixed w-full z-50 transition-all duration-300 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <a href="${homeLink}" class="text-2xl font-serif font-bold text-amra-dark tracking-tight flex items-center gap-2">
-                <img src="${logoPath}" alt="Amra Logo" class="w-8 h-8">
+                <img src="${logoPath}" alt="Amra Logo" width="32" height="32" class="w-8 h-8">
                 Amra<span class="text-amra-primary">Property</span>
             </a>
 
@@ -66,7 +66,7 @@ const components = {
             <div>
                 <div class="flex items-center justify-between mb-8">
                     <a href="${homeLink}" class="text-xl font-serif font-bold text-amra-dark tracking-tight flex items-center gap-2">
-                        <img src="${logoPath}" alt="Amra Logo" class="w-7 h-7">
+                        <img src="${logoPath}" alt="Amra Logo" width="28" height="28" class="w-7 h-7">
                         Amra<span class="text-amra-primary">Prop</span>
                     </a>
                     <button id="close-mobile-menu" class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-gray-500 hover:text-amra-dark hover:bg-slate-100 transition-colors" aria-label="Close Mobile Menu">
@@ -108,7 +108,7 @@ const components = {
             <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
                 <div class="md:col-span-2">
                     <a href="${homeLink}" class="text-3xl font-serif font-bold text-white tracking-tight flex items-center gap-2 mb-6">
-                        <img src="${logoPath}" alt="Amra Logo" class="w-10 h-10">
+                        <img src="${logoPath}" alt="Amra Logo" width="40" height="40" class="w-10 h-10">
                         Amra<span class="text-amra-primary">Property</span>
                     </a>
                     <p class="text-gray-400 max-w-sm leading-relaxed mb-8">
