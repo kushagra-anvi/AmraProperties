@@ -31,6 +31,15 @@
                         <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-350 border border-slate-700">
                             {{ $partner->type }}
                         </span>
+                        @if ($partner->user_id && $partner->user)
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-teal-500/20 text-teal-400 border border-teal-500/30 flex items-center gap-1">
+                                <i data-lucide="key-round" class="w-3.5 h-3.5"></i> Portal Access Enabled ({{ $partner->user->email }})
+                            </span>
+                        @else
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-750 flex items-center gap-1">
+                                <i data-lucide="key-round" class="w-3.5 h-3.5"></i> Portal Access Disabled
+                            </span>
+                        @endif
                         @if (!$partner->is_active)
                             <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-500/20 text-rose-455 border border-rose-500/30">
                                 Inactive

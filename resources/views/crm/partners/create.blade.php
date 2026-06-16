@@ -181,6 +181,37 @@
                 </div>
             </div>
 
+            <!-- Section 4: Portal Access -->
+            <div class="space-y-4 pt-4 border-t border-slate-800/40">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-800 pb-2">Portal Access</h3>
+                
+                <div class="space-y-4">
+                    <!-- Checkbox -->
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="enable_portal_access" name="enable_portal_access" value="1" {{ old('enable_portal_access') ? 'checked' : '' }}
+                            class="w-4 h-4 text-amra-primary bg-slate-950 border-slate-800 rounded focus:ring-amra-primary focus:ring-2 focus:ring-offset-slate-900">
+                        <label for="enable_portal_access" class="text-xs font-bold text-slate-400 cursor-pointer">Enable Portal Access</label>
+                    </div>
+
+                    <!-- Password and email block (hidden by default unless checkbox is checked) -->
+                    <div id="portal_credentials_section" class="grid gap-6 md:grid-cols-2 {{ old('enable_portal_access') ? '' : 'hidden' }}">
+                        <div class="space-y-1.5">
+                            <label for="portal_email" class="text-xs font-bold text-slate-400">Portal Login Email</label>
+                            <input id="portal_email" name="portal_email" type="email" value="{{ old('portal_email') }}" placeholder="partner-login@amra.com"
+                                class="w-full bg-slate-950 border border-slate-800 focus:border-amra-primary rounded-xl px-4 py-3 outline-none text-sm text-slate-250 placeholder-slate-650">
+                            <p class="text-[10px] text-slate-500">If left blank, the partner's primary email will be used.</p>
+                        </div>
+                        
+                        <div class="space-y-1.5">
+                            <label for="password" class="text-xs font-bold text-slate-400">Portal Password</label>
+                            <input id="password" name="password" type="password" placeholder="Enter custom password"
+                                class="w-full bg-slate-950 border border-slate-800 focus:border-amra-primary rounded-xl px-4 py-3 outline-none text-sm text-slate-250 placeholder-slate-650">
+                            <p class="text-[10px] text-slate-500">If left blank, it defaults to <code>password</code>.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Actions -->
             <div class="pt-6 border-t border-slate-800 flex justify-end gap-3">
                 <a href="{{ route('crm.partners.index') }}" class="bg-slate-800 hover:bg-slate-755 text-slate-350 font-bold text-xs px-6 py-3.5 rounded-xl transition-all">
@@ -216,6 +247,18 @@
                     input.value = value;
                     container.appendChild(input);
                 });
+            });
+        }
+
+        const portalCheckbox = document.getElementById('enable_portal_access');
+        const portalSection = document.getElementById('portal_credentials_section');
+        if (portalCheckbox && portalSection) {
+            portalCheckbox.addEventListener('change', () => {
+                if (portalCheckbox.checked) {
+                    portalSection.classList.remove('hidden');
+                } else {
+                    portalSection.classList.add('hidden');
+                }
             });
         }
     });

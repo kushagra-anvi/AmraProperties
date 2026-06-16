@@ -13,6 +13,9 @@ use App\Http\Controllers\PlatformSpendController;
 use App\Http\Controllers\SalesTeamController;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\PropertyController;
+use App\Http\Controllers\BlogController;
+
 /*
 |--------------------------------------------------------------------------
 | Public Client-Facing Website Routes
@@ -20,7 +23,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('site.home');
+    $featuredProperties = \App\Models\Property::where('status', 'publish')
+        ->where('is_featured', true)
+        ->latest()
+        ->take(6)
+        ->get();
+    return view('site.home', compact('featuredProperties'));
 })->name('site.home');
 
 Route::get('/about', function () {
@@ -31,9 +39,11 @@ Route::get('/contact', function () {
     return view('site.contact');
 })->name('site.contact');
 
-Route::get('/property', function () {
-    return view('site.property');
-})->name('site.property');
+Route::get('/property', [PropertyController::class, 'index'])->name('site.property');
+
+Route::get('/blog', [BlogController::class, 'index'])->name('site.blog');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('site.blog.show');
+
 
 Route::get('/privacy', function () {
     return view('site.privacy');
@@ -120,6 +130,7 @@ Route::middleware('auth')->prefix('crm')->group(function () {
         
         // B2C Share to Agent/Developer workflow
         Route::post('/b2c/{lead}/share', [B2CLeadController::class, 'share'])->name('crm.b2c.share');
+        Route::post('/b2c/{lead}/auto-distribute', [B2CLeadController::class, 'autoDistribute'])->name('crm.b2c.auto-distribute');
         
         // B2C Tele-caller assignment and CSV bulk import
         Route::post('/b2c/{lead}/assign', [B2CLeadController::class, 'assign'])->name('crm.b2c.assign');
@@ -141,4 +152,14 @@ Route::middleware('auth')->prefix('crm')->group(function () {
         Route::get('/sales', [SalesTeamController::class, 'index'])->name('crm.sales.index');
         Route::get('/sales/{salesPerson}', [SalesTeamController::class, 'show'])->name('crm.sales.show');
     });
+});
+
+/*
+|--------------------------------------------------------------------------
+| Partner Portal Routes (Protected by Auth and Role)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:partner'])->prefix('partner')->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\PartnerPortalController::class, 'dashboard'])->name('crm.partner.dashboard');
+    Route::get('/leads/{lead}', [App\Http\Controllers\PartnerPortalController::class, 'showLead'])->name('crm.partner.leads.show');
 });

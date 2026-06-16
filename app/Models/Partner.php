@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Partner extends Model
 {
     protected $fillable = [
+        'user_id',
         'type',
         'company_name',
         'contact_person',
@@ -36,6 +37,11 @@ class Partner extends Model
             'renewal_date' => 'date',
             'is_active' => 'boolean',
         ];
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function assignedSalesPerson(): BelongsTo

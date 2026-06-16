@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\B2CLead;
 use App\Models\LeadStatusLog;
+use App\Services\B2CLeadAutoDistributor;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -54,6 +55,8 @@ class B2CLeadImportController extends Controller
 
         $rowCount = 0;
         $importCount = 0;
+        $autoShareCount = 0;
+        $autoDistributor = app(B2CLeadAutoDistributor::class);
 
         while (($row = fgetcsv($handle)) !== false) {
             $rowCount++;
@@ -119,11 +122,15 @@ class B2CLeadImportController extends Controller
                 'notes' => 'Buyer lead imported via bulk CSV upload.',
             ]);
 
+            $autoShareCount += $autoDistributor
+                ->distribute($lead, Auth::id(), 'CSV bulk upload')
+                ->count();
+
             $importCount++;
         }
 
         fclose($handle);
 
-        return back()->with('success', "Successfully imported {$importCount} B2C Leads out of {$rowCount} rows parsed.");
+        return back()->with('success', "Successfully imported {$importCount} B2C Leads out of {$rowCount} rows parsed. Auto-shared {$autoShareCount} partner lead assignment(s).");
     }
 }

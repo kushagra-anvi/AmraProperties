@@ -59,6 +59,15 @@ class DatabaseSeeder extends Seeder
             'location' => 'Pune',
         ]);
 
+        $partnerUser = User::create([
+            'name' => 'Amit Shah',
+            'email' => 'partner@amra.com',
+            'password' => $password,
+            'role' => 'partner',
+            'phone' => '+91 97777 66666',
+            'location' => 'Mumbai',
+        ]);
+
         // 2. Seed Sales People Profiles
         $repRahul = SalesPerson::create([
             'user_id' => $salesUser->id,
@@ -79,6 +88,7 @@ class DatabaseSeeder extends Seeder
 
         // 3. Seed Certified Partners (Agents & Developers)
         $partnerAbc = Partner::create([
+            'user_id' => $partnerUser->id,
             'type' => 'agent',
             'company_name' => 'ABC Realty Group',
             'contact_person' => 'Amit Shah',
@@ -297,6 +307,16 @@ class DatabaseSeeder extends Seeder
                     'shared_by_user_id' => $adminUser->id,
                     'shared_at' => now()->subDay(),
                     'remark' => 'High priority Gomti Nagar requirement shared with Developer.',
+                ]);
+            }
+
+            if ($lead->name === 'Amit Bhatia') {
+                B2CLeadShare::create([
+                    'b2_c_lead_id' => $lead->id,
+                    'partner_id' => $partnerAbc->id,
+                    'shared_by_user_id' => $adminUser->id,
+                    'shared_at' => now()->subDays(2),
+                    'remark' => 'Powai flat buyer shared with ABC Realty Group.',
                 ]);
             }
         }

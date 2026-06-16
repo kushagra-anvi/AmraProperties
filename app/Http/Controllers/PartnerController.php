@@ -103,7 +103,7 @@ class PartnerController extends Controller
             abort(403);
         }
 
-        $validated = $request->validate([
+        $rules = [
             'type' => ['required', 'string', 'in:agent,developer,affiliate'],
             'company_name' => ['required', 'string', 'max:255'],
             'contact_person' => ['required', 'string', 'max:255'],
@@ -119,9 +119,35 @@ class PartnerController extends Controller
             'assigned_sales_person_id' => ['nullable', 'exists:sales_people,id'],
             'lead_source' => ['nullable', 'string', 'max:100'],
             'remark' => ['nullable', 'string'],
-        ]);
+        ];
+
+        if ($request->boolean('enable_portal_access')) {
+            $rules['portal_email'] = ['nullable', 'email', 'unique:users,email'];
+            if (!$request->input('portal_email')) {
+                $rules['email'] = ['required', 'email', 'max:255', 'unique:users,email'];
+            }
+            $rules['password'] = ['nullable', 'string', 'min:6'];
+        }
+
+        $validated = $request->validate($rules);
+
+        $user_id = null;
+        if ($request->boolean('enable_portal_access')) {
+            $email = $request->input('portal_email') ?: $request->input('email');
+            $password = $request->input('password') ?: 'password';
+            
+            $user = \App\Models\User::create([
+                'name' => $validated['contact_person'],
+                'email' => $email,
+                'password' => \Illuminate\Support\Facades\Hash::make($password),
+                'role' => 'partner',
+                'phone' => $validated['phone'],
+            ]);
+            $user_id = $user->id;
+        }
 
         $validated['is_active'] = true;
+        $validated['user_id'] = $user_id;
         Partner::create($validated);
 
         return redirect()->route('crm.partners.index')
@@ -180,7 +206,7 @@ class PartnerController extends Controller
             abort(403);
         }
 
-        $validated = $request->validate([
+        $rules = [
             'type' => ['required', 'string', 'in:agent,developer,affiliate'],
             'company_name' => ['required', 'string', 'max:255'],
             'contact_person' => ['required', 'string', 'max:255'],
@@ -197,7 +223,59 @@ class PartnerController extends Controller
             'lead_source' => ['nullable', 'string', 'max:100'],
             'remark' => ['nullable', 'string'],
             'is_active' => ['required', 'boolean'],
-        ]);
+        ];
+
+        $userId = $partner->user_id;
+
+        if ($request->boolean('enable_portal_access')) {
+            $rules['portal_email'] = ['nullable', 'email', $userId ? 'unique:users,email,' . $userId : 'unique:users,email'];
+            if (!$request->input('portal_email')) {
+                $rules['email'] = ['required', 'email', 'max:255', $userId ? 'unique:users,email,' . $userId : 'unique:users,email'];
+            }
+            $rules['password'] = ['nullable', 'string', 'min:6'];
+        }
+
+        $validated = $request->validate($rules);
+
+        if ($request->boolean('enable_portal_access')) {
+            $email = $request->input('portal_email') ?: $request->input('email');
+            
+            if ($partner->user_id) {
+                // Update existing user
+                $user = \App\Models\User::find($partner->user_id);
+                if ($user) {
+                    $userData = [
+                        'name' => $validated['contact_person'],
+                        'email' => $email,
+                        'phone' => $validated['phone'],
+                    ];
+                    if ($request->filled('password')) {
+                        $userData['password'] = \Illuminate\Support\Facades\Hash::make($request->input('password'));
+                    }
+                    $user->update($userData);
+                }
+            } else {
+                // Create new user
+                $password = $request->input('password') ?: 'password';
+                $user = \App\Models\User::create([
+                    'name' => $validated['contact_person'],
+                    'email' => $email,
+                    'password' => \Illuminate\Support\Facades\Hash::make($password),
+                    'role' => 'partner',
+                    'phone' => $validated['phone'],
+                ]);
+                $validated['user_id'] = $user->id;
+            }
+        } else {
+            // Delete user if exists
+            if ($partner->user_id) {
+                $user = \App\Models\User::find($partner->user_id);
+                if ($user) {
+                    $user->delete();
+                }
+                $validated['user_id'] = null;
+            }
+        }
 
         $partner->update($validated);
 

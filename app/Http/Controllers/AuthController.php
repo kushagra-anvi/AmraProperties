@@ -15,6 +15,13 @@ class AuthController extends Controller
     public function showLogin(): View|RedirectResponse
     {
         if (Auth::check()) {
+            $user = Auth::user();
+            if ($user->role === 'partner') {
+                return redirect()->route('crm.partner.dashboard');
+            }
+            if ($user->role === 'sales_team') {
+                return redirect()->route('crm.b2b.index');
+            }
             return redirect()->route('crm.dashboard');
         }
 
@@ -36,8 +43,18 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
+            $user = Auth::user();
+            if ($user->role === 'partner') {
+                return redirect()->route('crm.partner.dashboard')
+                    ->with('success', 'Welcome back, ' . $user->name . '!');
+            }
+            if ($user->role === 'sales_team') {
+                return redirect()->route('crm.b2b.index')
+                    ->with('success', 'Welcome back, ' . $user->name . '!');
+            }
+
             return redirect()->intended(route('crm.dashboard'))
-                ->with('success', 'Welcome back, ' . Auth::user()->name . '!');
+                ->with('success', 'Welcome back, ' . $user->name . '!');
         }
 
         return back()->withErrors([

@@ -25,3 +25,7 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+*.sql
+/public/wp-content
+/amra_wp_files.zip
+

@@ -8,6 +8,7 @@ use App\Models\B2CLeadShare;
 use App\Models\Partner;
 use App\Models\LeadStatusLog;
 use App\Models\SalesPerson;
+use App\Services\B2CLeadAutoDistributor;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -125,7 +126,15 @@ class B2CLeadController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Buyer lead marked as admin filtered.');
+        $autoShares = app(B2CLeadAutoDistributor::class)
+            ->distribute($lead->fresh(), Auth::id(), 'admin filter');
+
+        $message = 'Buyer lead marked as admin filtered.';
+        if ($autoShares->isNotEmpty()) {
+            $message .= ' Auto-shared to ' . $autoShares->count() . ' package-eligible partner(s).';
+        }
+
+        return back()->with('success', $message);
     }
 
     public function create(): View
@@ -179,8 +188,16 @@ class B2CLeadController extends Controller
             'notes' => 'B2C Buyer Lead created manually.',
         ]);
 
+        $autoShares = app(B2CLeadAutoDistributor::class)
+            ->distribute($lead, Auth::id(), 'manual lead creation');
+
+        $message = 'B2C Buyer Lead created successfully!';
+        if ($autoShares->isNotEmpty()) {
+            $message .= ' Auto-shared to ' . $autoShares->count() . ' package-eligible partner(s).';
+        }
+
         return redirect()->route('crm.b2c.index')
-            ->with('success', 'B2C Buyer Lead created successfully!');
+            ->with('success', $message);
     }
 
     /**
@@ -295,6 +312,25 @@ class B2CLeadController extends Controller
         }
 
         return back()->with('success', "Lead shared successfully with {$shareCount} partner(s).");
+    }
+
+    /**
+     * Manually trigger package-based auto distribution for an existing lead.
+     */
+    public function autoDistribute(B2CLead $lead): RedirectResponse
+    {
+        if (Auth::user()->role === 'analyst') {
+            abort(403, 'Analysts cannot distribute leads.');
+        }
+
+        $autoShares = app(B2CLeadAutoDistributor::class)
+            ->distribute($lead, Auth::id(), 'manual auto-distribution');
+
+        if ($autoShares->isEmpty()) {
+            return back()->with('success', 'No new package-eligible partners found for auto assignment.');
+        }
+
+        return back()->with('success', 'Auto-assigned lead to ' . $autoShares->count() . ' package-eligible partner(s).');
     }
 
     /**

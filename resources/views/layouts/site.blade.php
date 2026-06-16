@@ -11,7 +11,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.397.0/dist/umd/lucide.min.js"></script>
     
     <script>
         tailwind.config = {
@@ -45,6 +45,7 @@
             <div class="hidden md:flex items-center gap-8">
                 <a href="{{ route('site.home') }}" class="{{ Route::currentRouteName() === 'site.home' ? 'text-amra-primary font-bold text-sm' : 'text-gray-600 hover:text-amra-primary font-medium text-sm' }} transition-colors">Home</a>
                 <a href="{{ route('site.property') }}" class="{{ Route::currentRouteName() === 'site.property' ? 'text-amra-primary font-bold text-sm' : 'text-gray-600 hover:text-amra-primary font-medium text-sm' }} transition-colors">Property</a>
+                <a href="{{ route('site.blog') }}" class="{{ Route::currentRouteName() === 'site.blog' ? 'text-amra-primary font-bold text-sm' : 'text-gray-600 hover:text-amra-primary font-medium text-sm' }} transition-colors">Blog</a>
                 <a href="{{ route('site.about') }}" class="{{ Route::currentRouteName() === 'site.about' ? 'text-amra-primary font-bold text-sm' : 'text-gray-600 hover:text-amra-primary font-medium text-sm' }} transition-colors">About Us</a>
                 <a href="{{ route('site.contact') }}" class="{{ Route::currentRouteName() === 'site.contact' ? 'text-amra-primary font-bold text-sm' : 'text-gray-600 hover:text-amra-primary font-medium text-sm' }} transition-colors">Contact</a>
             </div>
@@ -79,6 +80,7 @@
                 <nav class="flex flex-col gap-5">
                     <a href="{{ route('site.home') }}" class="{{ Route::currentRouteName() === 'site.home' ? 'text-amra-primary font-bold text-base' : 'text-slate-600 hover:text-amra-primary font-semibold text-base' }} transition-colors">Home</a>
                     <a href="{{ route('site.property') }}" class="{{ Route::currentRouteName() === 'site.property' ? 'text-amra-primary font-bold text-base' : 'text-slate-600 hover:text-amra-primary font-semibold text-base' }} transition-colors">Property</a>
+                    <a href="{{ route('site.blog') }}" class="{{ Route::currentRouteName() === 'site.blog' ? 'text-amra-primary font-bold text-base' : 'text-slate-600 hover:text-amra-primary font-semibold text-base' }} transition-colors">Blog</a>
                     <a href="{{ route('site.about') }}" class="{{ Route::currentRouteName() === 'site.about' ? 'text-amra-primary font-bold text-base' : 'text-slate-600 hover:text-amra-primary font-semibold text-base' }} transition-colors">About Us</a>
                     <a href="{{ route('site.contact') }}" class="{{ Route::currentRouteName() === 'site.contact' ? 'text-amra-primary font-bold text-base' : 'text-slate-600 hover:text-amra-primary font-semibold text-base' }} transition-colors">Contact</a>
                 </nav>
@@ -132,6 +134,7 @@
                         <li><a href="{{ route('site.home') }}" class="hover:text-amra-primary transition-colors">Home</a></li>
                         <li><a href="{{ route('site.about') }}" class="hover:text-amra-primary transition-colors">About Us</a></li>
                         <li><a href="{{ route('site.property') }}" class="hover:text-amra-primary transition-colors">Property</a></li>
+                        <li><a href="{{ route('site.blog') }}" class="hover:text-amra-primary transition-colors">Blog</a></li>
                         <li><a href="{{ route('site.contact') }}" class="hover:text-amra-primary transition-colors">Contact</a></li>
                     </ul>
                 </div>

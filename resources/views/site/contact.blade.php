@@ -127,88 +127,86 @@
 
 @section('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const form = document.getElementById('contact-form');
-            const formContainer = document.getElementById('form-container');
-            const submitBtn = document.getElementById('submit-btn');
+        const form = document.getElementById('contact-form');
+        const formContainer = document.getElementById('form-container');
+        const submitBtn = document.getElementById('submit-btn');
 
-            if (form) {
-                form.addEventListener('submit', (e) => {
-                    e.preventDefault();
+        if (form) {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
 
-                    const firstName = document.getElementById('first-name').value;
-                    const lastName = document.getElementById('last-name').value;
-                    const email = document.getElementById('email').value;
-                    const message = document.getElementById('message').value;
+                const firstName = document.getElementById('first-name').value;
+                const lastName = document.getElementById('last-name').value;
+                const email = document.getElementById('email').value;
+                const message = document.getElementById('message').value;
 
-                    // Apply animated loading spinner to submit button
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = `
-                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Sending…
-                    `;
+                // Apply animated loading spinner to submit button
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Sending…
+                `;
 
-                    // Send AJAX post to our Laravel B2C organic uploader
-                    fetch('/contact', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            first_name: firstName,
-                            last_name: lastName,
-                            email: email,
-                            message: message
-                        })
+                // Send AJAX post to our Laravel B2C organic uploader
+                fetch('/contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        first_name: firstName,
+                        last_name: lastName,
+                        email: email,
+                        message: message
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            formContainer.classList.add('transition-all', 'duration-500', 'opacity-0');
-                            
-                            setTimeout(() => {
-                                formContainer.innerHTML = `
-                                    <div class="text-center py-12 flex flex-col items-center justify-center">
-                                        <div class="w-20 h-20 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mb-6 animate-bounce shadow-inner">
-                                            <i data-lucide="check-circle-2" class="w-10 h-10"></i>
-                                        </div>
-                                        <h3 class="text-3xl font-serif font-extrabold text-slate-800 mb-3">Thank You, ${firstName}!</h3>
-                                        <p class="text-slate-500 text-sm max-w-md mx-auto leading-relaxed mb-8">
-                                            Your message has been securely submitted to our concierge desk. One of our dedicated certified **Amra Partners** will connect with you in under 15 minutes.
-                                        </p>
-                                        <button onclick="window.location.reload()"
-                                            class="bg-amra-dark text-white px-8 py-3.5 rounded-xl font-bold text-xs hover:bg-black transition-colors shadow-md">
-                                            Send Another Message
-                                        </button>
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        formContainer.classList.add('transition-all', 'duration-500', 'opacity-0');
+                        
+                        setTimeout(() => {
+                            formContainer.innerHTML = `
+                                <div class="text-center py-12 flex flex-col items-center justify-center">
+                                    <div class="w-20 h-20 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mb-6 animate-bounce shadow-inner">
+                                        <i data-lucide="check-circle-2" class="w-10 h-10"></i>
                                     </div>
-                                `;
-                                
-                                // Re-trigger Lucide icons for injected success node
-                                if (window.lucide) {
-                                    window.lucide.createIcons();
-                                }
-                                
-                                formContainer.classList.remove('opacity-0');
-                                formContainer.classList.add('opacity-100');
-                            }, 300);
-                        } else {
-                            alert(data.message || 'An error occurred. Please try again.');
-                            submitBtn.disabled = false;
-                            submitBtn.innerText = 'Send Message';
-                        }
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        alert('Unable to connect to the server. Please check your connection and try again.');
+                                    <h3 class="text-3xl font-serif font-extrabold text-slate-800 mb-3">Thank You, ${firstName}!</h3>
+                                    <p class="text-slate-500 text-sm max-w-md mx-auto leading-relaxed mb-8">
+                                        Your message has been securely submitted to our concierge desk. One of our dedicated certified **Amra Partners** will connect with you in under 15 minutes.
+                                    </p>
+                                    <button onclick="window.location.reload()"
+                                        class="bg-amra-dark text-white px-8 py-3.5 rounded-xl font-bold text-xs hover:bg-black transition-colors shadow-md">
+                                        Send Another Message
+                                    </button>
+                                </div>
+                            `;
+                            
+                            // Re-trigger Lucide icons for injected success node
+                            if (window.lucide) {
+                                window.lucide.createIcons();
+                            }
+                            
+                            formContainer.classList.remove('opacity-0');
+                            formContainer.classList.add('opacity-100');
+                        }, 300);
+                    } else {
+                        alert(data.message || 'An error occurred. Please try again.');
                         submitBtn.disabled = false;
                         submitBtn.innerText = 'Send Message';
-                    });
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Unable to connect to the server. Please check your connection and try again.');
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = 'Send Message';
                 });
-            }
-        });
+            });
+        }
     </script>
 @endsection

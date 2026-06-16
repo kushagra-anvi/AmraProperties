@@ -60,12 +60,34 @@ return [
     'partner_types' => [
         'agent' => 'Agent',
         'developer' => 'Developer',
+        'affiliate' => 'Affiliate Partner',
     ],
 
     'packages' => [
         'free' => 'Free',
         'starter' => 'Starter',
         'growth' => 'Growth',
+        'premium' => 'Premium',
+        'customise' => 'Customise',
+    ],
+
+    'auto_distribution' => [
+        'enabled' => true,
+        'lookback_days' => 30,
+        'package_limits' => [
+            'free' => 0,
+            'starter' => 1,
+            'growth' => 2,
+            'premium' => 3,
+            'customise' => 3,
+        ],
+        'package_priority' => [
+            'customise' => 50,
+            'premium' => 40,
+            'growth' => 30,
+            'starter' => 20,
+            'free' => 0,
+        ],
     ],
 
     'date_filters' => [

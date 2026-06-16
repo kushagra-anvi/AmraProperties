@@ -157,6 +157,13 @@
                 </a>
             @endif
 
+            @if ($userRole === 'partner')
+                <a href="{{ route('crm.partner.dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm sidebar-link-inactive text-slate-400 hover:bg-slate-800/50 hover:text-white {{ request()->routeIs('crm.partner.*') ? 'sidebar-link-active' : '' }}">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                    Partner Dashboard
+                </a>
+            @endif
+
             @if ($canViewB2BModule || $canViewBuyerAndPartnerModules)
                 <div class="pt-4 pb-2 px-4">
                     <span class="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Leads Pipeline</span>

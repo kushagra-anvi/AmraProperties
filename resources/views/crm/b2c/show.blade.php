@@ -204,9 +204,18 @@
                 </div>
 
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-md space-y-4">
-                    <div>
-                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-800 pb-2.5">Distribute Lead to Partners</h3>
-                        <p class="text-[10px] text-slate-500 mt-1.5 leading-relaxed">Select one or more active certified partner developers/agents to securely share this buyer's contact details and requirements.</p>
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between border-b border-slate-800 pb-3">
+                        <div>
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Distribute Lead to Partners</h3>
+                            <p class="text-[10px] text-slate-500 mt-1.5 leading-relaxed">Auto assign by partner package rules, or manually select certified partners to share this buyer's contact details and requirements.</p>
+                        </div>
+                        <form action="{{ route('crm.b2c.auto-distribute', $lead->id) }}" method="POST" class="shrink-0">
+                            @csrf
+                            <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-800 px-3 py-2 text-[10px] font-extrabold uppercase tracking-wider text-slate-200 transition-all hover:bg-slate-700">
+                                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amra-primary"></i>
+                                Auto Assign by Package
+                            </button>
+                        </form>
                     </div>
 
                     <form action="{{ route('crm.b2c.share', $lead->id) }}" method="POST" class="space-y-4">
