@@ -15,11 +15,6 @@ class B2BLeadImportController extends Controller
      */
     public function import(Request $request): RedirectResponse
     {
-        // Enforce RBAC: Sales Team cannot upload CSV bulk leads
-        if (Auth::user()->role === 'sales_team') {
-            abort(403, 'Unauthorized to import leads.');
-        }
-
         $request->validate([
             'csv_file' => ['required', 'file', 'mimes:csv,txt', 'max:5120'], // Max 5MB
         ]);

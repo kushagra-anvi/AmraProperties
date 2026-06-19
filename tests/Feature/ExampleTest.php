@@ -22,7 +22,7 @@ class ExampleTest extends TestCase
 
     public function test_public_site_blade_pages_render_successfully(): void
     {
-        foreach (['/', '/about', '/contact', '/property', '/privacy', '/terms'] as $path) {
+        foreach (['/', '/about', '/contact', '/property', '/privacy-policy', '/terms-conditions', '/rera-disclaimer', '/advertiser-agreement'] as $path) {
             $this->get($path)->assertStatus(200);
         }
     }
@@ -32,8 +32,15 @@ class ExampleTest extends TestCase
         $this->get('/pages/about.html')->assertRedirect('/about');
         $this->get('/pages/contact.html')->assertRedirect('/contact');
         $this->get('/pages/property.html')->assertRedirect('/property');
-        $this->get('/pages/privacy.html')->assertRedirect('/privacy');
-        $this->get('/pages/terms.html')->assertRedirect('/terms');
+        $this->get('/pages/privacy.html')->assertRedirect('/privacy-policy');
+        $this->get('/pages/terms.html')->assertRedirect('/terms-conditions');
+    }
+
+    public function test_legacy_privacy_terms_urls_redirect_to_new_paths(): void
+    {
+        $this->get('/privacy')->assertRedirect('/privacy-policy');
+        $this->get('/terms')->assertRedirect('/terms-conditions');
+        $this->get('/4521-2')->assertRedirect('/advertiser-agreement');
     }
 
     /**
@@ -387,5 +394,12 @@ class ExampleTest extends TestCase
         $response->assertSee('Day-Wise Calls Completed');
         $response->assertSee('Completed introduction call with Alice.');
         $response->assertSee('Schedule price negotiations.');
+    }
+
+    public function test_sales_team_cannot_access_b2b_bulk_import_route(): void
+    {
+        $salesTeamUser = User::factory()->create(['role' => 'sales_team']);
+        $response = $this->actingAs($salesTeamUser)->post('/crm/b2b/bulk-import', []);
+        $response->assertStatus(403);
     }
 }

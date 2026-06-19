@@ -40,18 +40,32 @@ Route::get('/contact', function () {
 })->name('site.contact');
 
 Route::get('/property', [PropertyController::class, 'index'])->name('site.property');
+Route::get('/property/{slug}', [PropertyController::class, 'show'])->name('site.property.show');
 
 Route::get('/blog', [BlogController::class, 'index'])->name('site.blog');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('site.blog.show');
 
 
-Route::get('/privacy', function () {
+Route::get('/privacy-policy', function () {
     return view('site.privacy');
 })->name('site.privacy');
 
-Route::get('/terms', function () {
+Route::get('/terms-conditions', function () {
     return view('site.terms');
 })->name('site.terms');
+
+Route::get('/rera-disclaimer', function () {
+    return view('site.rera-disclaimer');
+})->name('site.rera-disclaimer');
+
+Route::get('/advertiser-agreement', function () {
+    return view('site.advertiser-agreement');
+})->name('site.advertiser-agreement');
+
+// Legacy redirects
+Route::get('/privacy', fn () => redirect()->route('site.privacy', [], 301));
+Route::get('/terms', fn () => redirect()->route('site.terms', [], 301));
+Route::get('/4521-2', fn () => redirect()->route('site.advertiser-agreement', [], 301));
 
 Route::get('/pages/{page}.html', function (string $page) {
     abort_unless(in_array($page, ['about', 'contact', 'privacy', 'property', 'terms'], true), 404);
@@ -112,9 +126,6 @@ Route::middleware('auth')->prefix('crm')->group(function () {
         Route::post('/b2b/{lead}/status', [B2BLeadController::class, 'updateStatus'])->name('crm.b2b.status');
         Route::post('/b2b/{lead}/assign', [B2BLeadController::class, 'assign'])->name('crm.b2b.assign');
         Route::post('/b2b/{lead}/followup', [B2BLeadController::class, 'logFollowUp'])->name('crm.b2b.followup');
-
-        // B2B Lead Bulk Import
-        Route::post('/b2b/bulk-import', [B2BLeadImportController::class, 'import'])->name('crm.b2b.import');
     });
 
     // B2C distribution and partner management
@@ -142,6 +153,7 @@ Route::middleware('auth')->prefix('crm')->group(function () {
         Route::get('/partners/create', [PartnerController::class, 'create'])->name('crm.partners.create');
         Route::post('/partners', [PartnerController::class, 'store'])->name('crm.partners.store');
         Route::post('/partners/bulk-import', [PartnerImportController::class, 'import'])->name('crm.partners.import');
+        Route::post('/b2b/bulk-import', [B2BLeadImportController::class, 'import'])->name('crm.b2b.import');
         Route::get('/partners/{partner}', [PartnerController::class, 'show'])->name('crm.partners.show');
         Route::get('/partners/{partner}/edit', [PartnerController::class, 'edit'])->name('crm.partners.edit');
         Route::put('/partners/{partner}', [PartnerController::class, 'update'])->name('crm.partners.update');
