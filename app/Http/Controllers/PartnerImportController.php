@@ -6,6 +6,7 @@ use App\Models\Partner;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PartnerImportController extends Controller
 {
@@ -54,97 +55,120 @@ class PartnerImportController extends Controller
 
         $rowCount = 0;
         $importCount = 0;
+        $skipCount = 0;
 
-        while (($row = fgetcsv($handle)) !== false) {
-            $rowCount++;
-
-            // Map row data using headers
-            $data = [];
-            foreach ($headers as $index => $header) {
-                if (isset($row[$index])) {
-                    $data[$header] = trim($row[$index]);
+        DB::beginTransaction();
+        try {
+            while (($row = fgetcsv($handle)) !== false) {
+                $rowCount++;
+    
+                // Map row data using headers
+                $data = [];
+                foreach ($headers as $index => $header) {
+                    if (isset($row[$index])) {
+                        $data[$header] = trim($row[$index]);
+                    }
                 }
-            }
-
-            if (empty($data['company_name'])) {
-                continue; // Skip blank rows
-            }
-
-            // Map and Validate Partner Type
-            $type = 'agent';
-            if (isset($data['type'])) {
-                $rawType = strtolower($data['type']);
-                if (in_array($rawType, ['agent', 'broker', 'agent / broker'])) {
-                    $type = 'agent';
-                } elseif (in_array($rawType, ['developer', 'real estate developer'])) {
-                    $type = 'developer';
-                } elseif (in_array($rawType, ['affiliate', 'affiliate partner', 'affiliate_partner'])) {
-                    $type = 'affiliate';
+    
+                if (empty($data['company_name'])) {
+                    continue; // Skip blank rows
                 }
-            }
 
-            // Map and Validate Package
-            $package = 'free';
-            if (isset($data['package'])) {
-                $rawPackage = strtolower($data['package']);
-                if (in_array($rawPackage, ['free', 'starter', 'growth', 'premium', 'customise'])) {
-                    $package = $rawPackage;
+                // Deduplication check
+                $isDuplicate = false;
+                if (!empty($data['phone']) && Partner::where('phone', $data['phone'])->exists()) {
+                    $isDuplicate = true;
                 }
-            }
-
-            // Map Service Areas (comma separated)
-            $serviceAreas = [];
-            if (isset($data['service_areas']) && !empty($data['service_areas'])) {
-                $serviceAreas = array_map('trim', explode(',', $data['service_areas']));
-            }
-
-            // Parse Dates
-            $packagePurchaseDate = null;
-            if (isset($data['package_purchase_date']) && !empty($data['package_purchase_date'])) {
-                $time = strtotime($data['package_purchase_date']);
-                if ($time !== false) {
-                    $packagePurchaseDate = date('Y-m-d', $time);
+                if (!$isDuplicate && !empty($data['email']) && Partner::where('email', $data['email'])->exists()) {
+                    $isDuplicate = true;
                 }
-            }
 
-            $renewalDate = null;
-            if (isset($data['renewal_date']) && !empty($data['renewal_date'])) {
-                $time = strtotime($data['renewal_date']);
-                if ($time !== false) {
-                    $renewalDate = date('Y-m-d', $time);
+                if ($isDuplicate) {
+                    $skipCount++;
+                    continue;
                 }
+    
+                // Map and Validate Partner Type
+                $type = 'agent';
+                if (isset($data['type'])) {
+                    $rawType = strtolower($data['type']);
+                    if (in_array($rawType, ['agent', 'broker', 'agent / broker'])) {
+                        $type = 'agent';
+                    } elseif (in_array($rawType, ['developer', 'real estate developer'])) {
+                        $type = 'developer';
+                    } elseif (in_array($rawType, ['affiliate', 'affiliate partner', 'affiliate_partner'])) {
+                        $type = 'affiliate';
+                    }
+                }
+    
+                // Map and Validate Package
+                $package = 'free';
+                if (isset($data['package'])) {
+                    $rawPackage = strtolower($data['package']);
+                    if (in_array($rawPackage, ['free', 'starter', 'growth', 'premium', 'customise'])) {
+                        $package = $rawPackage;
+                    }
+                }
+    
+                // Map Service Areas (comma separated)
+                $serviceAreas = [];
+                if (isset($data['service_areas']) && !empty($data['service_areas'])) {
+                    $serviceAreas = array_map('trim', explode(',', $data['service_areas']));
+                }
+    
+                // Parse Dates
+                $packagePurchaseDate = null;
+                if (isset($data['package_purchase_date']) && !empty($data['package_purchase_date'])) {
+                    $time = strtotime($data['package_purchase_date']);
+                    if ($time !== false) {
+                        $packagePurchaseDate = date('Y-m-d', $time);
+                    }
+                }
+    
+                $renewalDate = null;
+                if (isset($data['renewal_date']) && !empty($data['renewal_date'])) {
+                    $time = strtotime($data['renewal_date']);
+                    if ($time !== false) {
+                        $renewalDate = date('Y-m-d', $time);
+                    }
+                }
+    
+                // Parse Paid Amount
+                $paidAmount = null;
+                if (isset($data['paid_amount']) && is_numeric($data['paid_amount'])) {
+                    $paidAmount = floatval($data['paid_amount']);
+                }
+    
+                // Create Partner Account
+                Partner::create([
+                    'type' => $type,
+                    'company_name' => $data['company_name'],
+                    'contact_person' => $data['contact_person'] ?? 'Unknown',
+                    'phone' => $data['phone'] ?? null,
+                    'email' => $data['email'] ?? null,
+                    'office_address' => $data['office_address'] ?? null,
+                    'service_areas' => $serviceAreas,
+                    'city' => $data['city'] ?? 'Unknown',
+                    'package' => $package,
+                    'paid_amount' => $paidAmount,
+                    'package_purchase_date' => $packagePurchaseDate,
+                    'renewal_date' => $renewalDate,
+                    'lead_source' => $data['lead_source'] ?? 'CSV Bulk Upload',
+                    'remark' => $data['remark'] ?? 'Imported via CSV',
+                    'is_active' => true,
+                ]);
+    
+                $importCount++;
             }
-
-            // Parse Paid Amount
-            $paidAmount = null;
-            if (isset($data['paid_amount']) && is_numeric($data['paid_amount'])) {
-                $paidAmount = floatval($data['paid_amount']);
-            }
-
-            // Create Partner Account
-            Partner::create([
-                'type' => $type,
-                'company_name' => $data['company_name'],
-                'contact_person' => $data['contact_person'] ?? 'Unknown',
-                'phone' => $data['phone'] ?? null,
-                'email' => $data['email'] ?? null,
-                'office_address' => $data['office_address'] ?? null,
-                'service_areas' => $serviceAreas,
-                'city' => $data['city'] ?? 'Unknown',
-                'package' => $package,
-                'paid_amount' => $paidAmount,
-                'package_purchase_date' => $packagePurchaseDate,
-                'renewal_date' => $renewalDate,
-                'lead_source' => $data['lead_source'] ?? 'CSV Bulk Upload',
-                'remark' => $data['remark'] ?? 'Imported via CSV',
-                'is_active' => true,
-            ]);
-
-            $importCount++;
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            fclose($handle);
+            return back()->with('error', 'Import failed: ' . $e->getMessage());
         }
 
         fclose($handle);
 
-        return back()->with('success', "Successfully imported {$importCount} Partners out of {$rowCount} rows parsed.");
+        return back()->with('success', "Successfully imported {$importCount} Partners. Skipped {$skipCount} duplicate(s) out of {$rowCount} rows parsed.");
     }
 }

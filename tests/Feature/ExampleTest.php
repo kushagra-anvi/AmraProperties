@@ -493,4 +493,58 @@ class ExampleTest extends TestCase
 
         unlink($tempFile);
     }
+
+    public function test_partner_bulk_import_skips_duplicates(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        // Seed an existing partner by phone
+        \App\Models\Partner::create([
+            'company_name' => 'Existing Partner Corp',
+            'contact_person' => 'Jane Agent',
+            'phone' => '7777777777',
+            'city' => 'Mumbai',
+            'type' => 'agent',
+            'package' => 'starter',
+            'is_active' => true,
+        ]);
+
+        // Seed an existing partner by email
+        \App\Models\Partner::create([
+            'company_name' => 'Existing Email Partner',
+            'contact_person' => 'Bob Broker',
+            'email' => 'bob@broker.com',
+            'city' => 'Pune',
+            'type' => 'agent',
+            'package' => 'free',
+            'is_active' => true,
+        ]);
+
+        $csvContent = "company_name,contact_person,phone,city,type,email,office_address,service_areas,package,paid_amount,package_purchase_date,renewal_date,lead_source,remark\n";
+        $csvContent .= "Imported Agent Corp,Agent Contact,7777777777,Mumbai,agent,agent@corp.com,Office 101,\"Powai, Chembur\",growth,15000,2026-06-01,2027-06-01,Direct,Great profile\n"; // Duplicate phone
+        $csvContent .= "Imported Affiliate Inc,Affiliate Person,8888888888,Lucknow,affiliate,bob@broker.com,Suite 202,Hazratganj,premium,25000,2026-06-02,2027-06-02,Reference,Affiliate partner\n"; // Duplicate email
+        $csvContent .= "Brand New Partner Corp,New Contact,9998882221,Delhi,agent,new@partner.com,Suite 300,Noida,premium,50000,2026-06-03,2027-06-03,Direct,Active\n"; // Unique Partner
+
+        $tempFile = tempnam(sys_get_temp_dir(), 'test_partner_') . '.csv';
+        file_put_contents($tempFile, $csvContent);
+
+        $uploadedFile = new \Illuminate\Http\UploadedFile(
+            $tempFile,
+            'partners.csv',
+            'text/csv',
+            null,
+            true
+        );
+
+        $response = $this->actingAs($admin)->post('/crm/partners/bulk-import', [
+            'csv_file' => $uploadedFile,
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertSessionHas('success', function($msg) {
+            return str_contains($msg, 'Successfully imported 1') && str_contains($msg, 'Skipped 2 duplicate(s)');
+        });
+
+        unlink($tempFile);
+    }
 }
