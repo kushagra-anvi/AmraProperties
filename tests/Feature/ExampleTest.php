@@ -451,4 +451,46 @@ class ExampleTest extends TestCase
 
         unlink($tempFile);
     }
+
+    public function test_b2c_bulk_import_skips_duplicates(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        
+        // Seed an existing buyer lead with same phone
+        \App\Models\B2CLead::create([
+            'name' => 'Existing Buyer',
+            'phone' => '9876543210',
+            'city' => 'Mumbai',
+            'property_type' => 'flat',
+            'configuration' => '3BHK',
+            'status' => 'new',
+            'lead_created_at' => now(),
+        ]);
+
+        $csvContent = "name,phone,city,property_type,configuration,email,budget_min,budget_max,preferred_locations,source_platform,remark\n";
+        $csvContent .= "Existing Buyer,9876543210,Mumbai,flat,3BHK,test@buyer.com,6000000,12000000,\"Powai, Bandra\",meta,Interested in Powai flats\n"; // Duplicate
+        $csvContent .= "Unique Buyer,9991112223,Pune,villa,4BHK,unique@buyer.com,8000000,15000000,Baner,manual,Looking for villa\n"; // New unique lead
+        
+        $tempFile = tempnam(sys_get_temp_dir(), 'test_b2c_') . '.csv';
+        file_put_contents($tempFile, $csvContent);
+
+        $uploadedFile = new \Illuminate\Http\UploadedFile(
+            $tempFile,
+            'b2c_leads.csv',
+            'text/csv',
+            null,
+            true
+        );
+
+        $response = $this->actingAs($admin)->post('/crm/b2c/bulk-import', [
+            'csv_file' => $uploadedFile,
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertSessionHas('success', function($msg) {
+            return str_contains($msg, 'Successfully imported 1') && str_contains($msg, 'Skipped 1 duplicate(s)');
+        });
+
+        unlink($tempFile);
+    }
 }
