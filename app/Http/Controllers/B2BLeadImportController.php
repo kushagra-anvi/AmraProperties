@@ -7,6 +7,7 @@ use App\Models\LeadStatusLog;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class B2BLeadImportController extends Controller
 {
@@ -50,75 +51,99 @@ class B2BLeadImportController extends Controller
 
         $rowCount = 0;
         $importCount = 0;
+        $skipCount = 0;
 
-        while (($row = fgetcsv($handle)) !== false) {
-            $rowCount++;
-            
-            // Map row data using headers
-            $data = [];
-            foreach ($headers as $index => $header) {
-                if (isset($row[$index])) {
-                    $data[$header] = trim($row[$index]);
+        DB::beginTransaction();
+        try {
+            while (($row = fgetcsv($handle)) !== false) {
+                $rowCount++;
+                
+                // Map row data using headers
+                $data = [];
+                foreach ($headers as $index => $header) {
+                    if (isset($row[$index])) {
+                        $data[$header] = trim($row[$index]);
+                    }
                 }
-            }
 
-            if (empty($data['company_name'])) {
-                continue; // Skip blank rows
-            }
-
-            // Map and Validate Fields
-            $category = 'agent';
-            if (isset($data['category']) && in_array(strtolower($data['category']), ['agent', 'developer', 'single_owner', 'single owner'])) {
-                $category = strtolower($data['category']);
-                if ($category === 'single owner') {
-                    $category = 'single_owner';
+                if (empty($data['company_name'])) {
+                    continue; // Skip blank rows
                 }
+
+                // Deduplication check
+                $isDuplicate = false;
+                if (!empty($data['contact_number'])) {
+                    $isDuplicate = B2BLead::where('contact_number', $data['contact_number'])->exists();
+                } else {
+                    $isDuplicate = B2BLead::where('company_name', $data['company_name'])
+                        ->where('city', $data['city'] ?? 'Unknown')
+                        ->exists();
+                }
+
+                if ($isDuplicate) {
+                    $skipCount++;
+                    continue;
+                }
+
+                // Map and Validate Fields
+                $category = 'agent';
+                if (isset($data['category']) && in_array(strtolower($data['category']), ['agent', 'developer', 'single_owner', 'single owner'])) {
+                    $category = strtolower($data['category']);
+                    if ($category === 'single owner') {
+                        $category = 'single_owner';
+                    }
+                }
+
+                $serviceAreas = [];
+                if (isset($data['service_areas']) && !empty($data['service_areas'])) {
+                    $serviceAreas = array_map('trim', explode(',', $data['service_areas']));
+                }
+
+                $sourcePlatform = 'csv';
+                if (isset($data['source_platform']) && in_array(strtolower($data['source_platform']), ['meta', 'google', 'website', 'manual', 'csv'])) {
+                    $sourcePlatform = strtolower($data['source_platform']);
+                }
+
+                // Create lead
+                $lead = B2BLead::create([
+                    'category' => $category,
+                    'company_name' => $data['company_name'],
+                    'contact_person_name' => $data['contact_person_name'] ?? 'Unknown',
+                    'contact_number' => $data['contact_number'] ?? null,
+                    'whatsapp_number' => $data['whatsapp_number'] ?? ($data['contact_number'] ?? null),
+                    'email' => $data['email'] ?? null,
+                    'office_address' => $data['office_address'] ?? null,
+                    'service_areas' => $serviceAreas,
+                    'city' => $data['city'] ?? 'Unknown',
+                    'project_ticket_size_min' => isset($data['project_ticket_size_min']) && is_numeric($data['project_ticket_size_min']) ? $data['project_ticket_size_min'] : null,
+                    'project_ticket_size_max' => isset($data['project_ticket_size_max']) && is_numeric($data['project_ticket_size_max']) ? $data['project_ticket_size_max'] : null,
+                    'source_platform' => $sourcePlatform,
+                    'lead_created_at' => now(),
+                    'status' => 'new',
+                    'remark' => $data['remark'] ?? 'Imported via CSV',
+                ]);
+
+                // Log Initial Status
+                LeadStatusLog::create([
+                    'lead_type' => B2BLead::class,
+                    'lead_id' => $lead->id,
+                    'from_status' => null,
+                    'to_status' => 'new',
+                    'changed_by_user_id' => Auth::id(),
+                    'notes' => 'Lead imported via bulk CSV upload.',
+                ]);
+
+                $importCount++;
             }
-
-            $serviceAreas = [];
-            if (isset($data['service_areas']) && !empty($data['service_areas'])) {
-                $serviceAreas = array_map('trim', explode(',', $data['service_areas']));
-            }
-
-            $sourcePlatform = 'csv';
-            if (isset($data['source_platform']) && in_array(strtolower($data['source_platform']), ['meta', 'google', 'website', 'manual', 'csv'])) {
-                $sourcePlatform = strtolower($data['source_platform']);
-            }
-
-            // Create lead
-            $lead = B2BLead::create([
-                'category' => $category,
-                'company_name' => $data['company_name'],
-                'contact_person_name' => $data['contact_person_name'] ?? 'Unknown',
-                'contact_number' => $data['contact_number'] ?? null,
-                'whatsapp_number' => $data['whatsapp_number'] ?? ($data['contact_number'] ?? null),
-                'email' => $data['email'] ?? null,
-                'office_address' => $data['office_address'] ?? null,
-                'service_areas' => $serviceAreas,
-                'city' => $data['city'] ?? 'Unknown',
-                'project_ticket_size_min' => isset($data['project_ticket_size_min']) && is_numeric($data['project_ticket_size_min']) ? $data['project_ticket_size_min'] : null,
-                'project_ticket_size_max' => isset($data['project_ticket_size_max']) && is_numeric($data['project_ticket_size_max']) ? $data['project_ticket_size_max'] : null,
-                'source_platform' => $sourcePlatform,
-                'lead_created_at' => now(),
-                'status' => 'new',
-                'remark' => $data['remark'] ?? 'Imported via CSV',
-            ]);
-
-            // Log Initial Status
-            LeadStatusLog::create([
-                'lead_type' => B2BLead::class,
-                'lead_id' => $lead->id,
-                'from_status' => null,
-                'to_status' => 'new',
-                'changed_by_user_id' => Auth::id(),
-                'notes' => 'Lead imported via bulk CSV upload.',
-            ]);
-
-            $importCount++;
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            fclose($handle);
+            return back()->with('error', 'Import failed: ' . $e->getMessage());
         }
 
         fclose($handle);
 
-        return back()->with('success', "Successfully imported {$importCount} B2B Leads out of {$rowCount} rows parsed.");
+        return back()->with('success', "Successfully imported {$importCount} B2B Leads. Skipped {$skipCount} duplicate(s) out of {$rowCount} rows parsed.");
     }
 }

@@ -402,4 +402,53 @@ class ExampleTest extends TestCase
         $response = $this->actingAs($salesTeamUser)->post('/crm/b2b/bulk-import', []);
         $response->assertStatus(403);
     }
+
+    public function test_b2b_bulk_import_skips_duplicates(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        
+        // Seed an existing lead with contact number
+        \App\Models\B2BLead::create([
+            'company_name' => 'Existing B2B Corp',
+            'contact_person_name' => 'John Doe',
+            'contact_number' => '9999999999',
+            'city' => 'Mumbai',
+            'status' => 'new',
+        ]);
+
+        // Seed another existing lead by name + city
+        \App\Models\B2BLead::create([
+            'company_name' => 'Unique Name Corp',
+            'contact_person_name' => 'Jane Smith',
+            'city' => 'Pune',
+            'status' => 'new',
+        ]);
+
+        $csvContent = "company_name,contact_person_name,contact_number,city\n";
+        $csvContent .= "Existing B2B Corp,John Doe,9999999999,Mumbai\n"; // Duplicate by contact number
+        $csvContent .= "Unique Name Corp,Jane Smith,,Pune\n"; // Duplicate by company_name + city (blank contact_number)
+        $csvContent .= "New Unique B2B,Bob Builder,8888888888,Mumbai\n"; // New unique lead
+        
+        $tempFile = tempnam(sys_get_temp_dir(), 'test_b2b_') . '.csv';
+        file_put_contents($tempFile, $csvContent);
+
+        $uploadedFile = new \Illuminate\Http\UploadedFile(
+            $tempFile,
+            'b2b_leads.csv',
+            'text/csv',
+            null,
+            true
+        );
+
+        $response = $this->actingAs($admin)->post('/crm/b2b/bulk-import', [
+            'csv_file' => $uploadedFile,
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertSessionHas('success', function($msg) {
+            return str_contains($msg, 'Successfully imported 1') && str_contains($msg, 'Skipped 2 duplicate(s)');
+        });
+
+        unlink($tempFile);
+    }
 }
