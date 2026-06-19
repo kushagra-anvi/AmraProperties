@@ -51,7 +51,6 @@
             </div>
 
             <div class="hidden md:flex items-center gap-4">
-                <a href="#" class="border-2 border-amra-primary text-amra-primary px-6 py-2 rounded-full font-bold text-sm hover:bg-amra-primary hover:text-white transition-colors">Post Free Ad</a>
                 <a href="{{ route('login') }}" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-amra-primary hover:text-white transition-colors">
                     <i data-lucide="user" class="w-5 h-5"></i>
                 </a>
@@ -87,7 +86,6 @@
             </div>
             
             <div class="flex flex-col gap-4 mt-8 pt-6 border-t border-gray-100">
-                <a href="#" class="border-2 border-amra-primary text-amra-primary text-center py-2.5 rounded-full font-bold text-sm hover:bg-amra-primary hover:text-white transition-colors">Post Free Ad</a>
                 <div class="flex items-center gap-3">
                     <a href="{{ route('login') }}" class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-gray-600">
                         <i data-lucide="user" class="w-5 h-5"></i>
