@@ -74,7 +74,7 @@
                         </div>
                         <div>
                             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Direct Hotline</h3>
-                            <a href="tel:+919999999999" class="text-xl font-serif font-bold text-slate-800 hover:text-amra-primary transition-colors block mb-1">+91 99999 99999</a>
+                            <a href="tel:+919559992958" class="text-xl font-serif font-bold text-slate-800 hover:text-amra-primary transition-colors block mb-1">+91 9559992958</a>
                             <p class="text-xs text-slate-400">Toll-free 24/7 dedicated support desk</p>
                         </div>
                     </div>
@@ -86,8 +86,20 @@
                         </div>
                         <div>
                             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">WhatsApp Channel</h3>
-                            <a href="https://wa.me/919999999999" target="_blank" rel="noopener" class="text-xl font-serif font-bold text-slate-800 hover:text-emerald-500 transition-colors block mb-1">Instant Chat Support</a>
+                            <a href="https://wa.me/919559992958" target="_blank" rel="noopener" class="text-xl font-serif font-bold text-slate-800 hover:text-emerald-500 transition-colors block mb-1">Instant Chat Support</a>
                             <p class="text-xs text-slate-400">Connect with an agent in under 2 minutes</p>
+                        </div>
+                    </div>
+
+                    <!-- Email Support Card -->
+                    <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm flex items-start gap-5 group hover:border-teal-500/20 transition-colors duration-300">
+                        <div class="w-12 h-12 rounded-2xl bg-teal-500/10 text-teal-600 flex items-center justify-center shrink-0">
+                            <i data-lucide="mail" class="w-5 h-5" aria-hidden="true"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Email Support</h3>
+                            <a href="mailto:info@amraproperty.com" class="text-xl font-serif font-bold text-slate-800 hover:text-amra-primary transition-colors block mb-1">info@amraproperty.com</a>
+                            <p class="text-xs text-slate-400">Response time in under 2 hours</p>
                         </div>
                     </div>
 
@@ -112,9 +124,9 @@
                         </div>
                         <div>
                             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Mumbai Office</h3>
-                            <h4 class="text-sm font-bold text-slate-800 mb-1">Hiranandani Business Park</h4>
+                            <h4 class="text-sm font-bold text-slate-800 mb-1">Rupa Solitaire</h4>
                             <p class="text-xs text-slate-500 leading-relaxed max-w-xs">
-                                Central Avenue, Powai, Mumbai, Maharashtra - 400076
+                                310, Wing C, Rupa Solitaire, MBP, Navi Mumbai, Maharashtra - 400710
                             </p>
                         </div>
                     </div>

@@ -149,12 +149,17 @@
                     </ul>
                 </div>
             </div>
-            
-            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-500 font-medium">
+            <div class="border-t border-gray-800 pt-8 mb-6 text-[10px] text-gray-500 leading-relaxed font-medium">
+                <p><strong class="text-gray-400">Disclaimer:</strong> Amra Property is a real estate listing and marketing platform. We do not act as a real estate agent or broker and do not participate in property transactions. Property details are provided by developers, brokers, or owners.</p>
+            </div>
+
+            <div class="border-t border-gray-800 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-500 font-medium">
                 <p>&copy; 2026 Amra Property. All rights reserved.</p>
-                <div class="flex gap-6">
+                <div class="flex flex-wrap gap-x-6 gap-y-2 justify-center">
                     <a href="{{ route('site.privacy') }}" class="hover:text-white transition-colors">Privacy Policy</a>
-                    <a href="{{ route('site.terms') }}" class="hover:text-white transition-colors">Terms of Service</a>
+                    <a href="{{ route('site.terms') }}" class="hover:text-white transition-colors">Terms & Conditions</a>
+                    <a href="{{ route('site.rera-disclaimer') }}" class="hover:text-white transition-colors">RERA Disclaimer</a>
+                    <a href="{{ route('site.advertiser-agreement') }}" class="hover:text-white transition-colors">Advertiser Agreement</a>
                 </div>
             </div>
         </div>

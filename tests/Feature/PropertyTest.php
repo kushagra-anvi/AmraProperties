@@ -164,4 +164,41 @@ class PropertyTest extends TestCase
         $response->assertSee('Mumbai Luxury Flat');
         $response->assertDontSee('Lucknow Premium Plot');
     }
+
+    /**
+     * Test single property details page renders successfully.
+     */
+    public function test_property_details_page_renders_successfully(): void
+    {
+        $property = Property::create([
+            'title' => 'Superior Palacia',
+            'slug' => 'superior-palacia-airoli',
+            'description' => 'A luxury apartment in Airoli.',
+            'price' => 12000000,
+            'city' => 'Airoli',
+            'status' => 'publish'
+        ]);
+
+        $response = $this->get(route('site.property.show', $property->slug));
+        $response->assertStatus(200);
+        $response->assertSee('Superior Palacia');
+    }
+
+    /**
+     * Test property details page returns 404 for draft properties.
+     */
+    public function test_property_details_page_returns_404_for_draft_properties(): void
+    {
+        $property = Property::create([
+            'title' => 'Draft Palacia',
+            'slug' => 'draft-palacia',
+            'description' => 'A draft apartment.',
+            'price' => 12000000,
+            'city' => 'Airoli',
+            'status' => 'draft'
+        ]);
+
+        $response = $this->get(route('site.property.show', $property->slug));
+        $response->assertStatus(404);
+    }
 }

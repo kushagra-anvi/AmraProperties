@@ -68,11 +68,7 @@
         </div>
 
         <!-- Pagination -->
-        @if($posts->hasPages())
-            <div class="mt-16 flex justify-center">
-                {{ $posts->links() }}
-            </div>
-        @endif
+        {{ $posts->links('components.pagination') }}
 
     </div>
 </div>

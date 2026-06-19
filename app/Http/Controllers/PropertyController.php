@@ -123,4 +123,28 @@ class PropertyController extends Controller
 
         return view('site.property', compact('properties'));
     }
+
+    /**
+     * Display the specified property.
+     */
+    public function show(string $slug): View
+    {
+        $property = Property::where('slug', $slug)
+            ->where('status', 'publish')
+            ->firstOrFail();
+
+        // Retrieve up to 3 related properties in the same city, excluding the current one
+        $relatedProperties = Property::where('status', 'publish')
+            ->where('id', '!=', $property->id)
+            ->where(function($query) use ($property) {
+                $query->where('city', $property->city)
+                      ->orWhere('configuration', 'like', '%' . $property->bedrooms . '%bhk%');
+            })
+            ->orderByDesc('is_featured')
+            ->orderByDesc('created_at')
+            ->take(3)
+            ->get();
+
+        return view('site.property-detail', compact('property', 'relatedProperties'));
+    }
 }
