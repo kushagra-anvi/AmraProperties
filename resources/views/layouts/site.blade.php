@@ -113,15 +113,24 @@
                     <p class="text-gray-400 max-w-sm leading-relaxed mb-8">
                         Your trusted partner in finding the perfect home. RERA-approved projects and verified developers in Lucknow & Mumbai.
                     </p>
-                    <div class="flex gap-4">
-                        <a href="#" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-amra-primary hover:text-white transition-all duration-300">
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="https://www.facebook.com/propertyamra" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-amra-primary hover:text-white transition-all duration-300" aria-label="Facebook">
+                            <i data-lucide="facebook" class="w-4 h-4"></i>
                         </a>
-                        <a href="#" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-amra-primary hover:text-white transition-all duration-300">
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>
+                        <a href="https://twitter.com/AmraProperty" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-amra-primary hover:text-white transition-all duration-300" aria-label="Twitter">
+                            <i data-lucide="twitter" class="w-4 h-4"></i>
                         </a>
-                        <a href="#" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-amra-primary hover:text-white transition-all duration-300">
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                        <a href="https://www.instagram.com/amra_property/" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-amra-primary hover:text-white transition-all duration-300" aria-label="Instagram">
+                            <i data-lucide="instagram" class="w-4 h-4"></i>
+                        </a>
+                        <a href="https://in.pinterest.com/amraproperty/" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-amra-primary hover:text-white transition-all duration-300" aria-label="Pinterest">
+                            <i data-lucide="pinterest" class="w-4 h-4"></i>
+                        </a>
+                        <a href="https://in.linkedin.com/company/amra-property-india" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-amra-primary hover:text-white transition-all duration-300" aria-label="LinkedIn">
+                            <i data-lucide="linkedin" class="w-4 h-4"></i>
+                        </a>
+                        <a href="https://www.youtube.com/@AMRAPROPERTY/" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-amra-primary hover:text-white transition-all duration-300" aria-label="YouTube">
+                            <i data-lucide="youtube" class="w-4 h-4"></i>
                         </a>
                     </div>
                 </div>
