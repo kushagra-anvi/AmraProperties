@@ -79,9 +79,9 @@
 
                 <!-- Rent/Sale Toggle Tabs -->
                 <div class="flex gap-1.5 mb-[-1px] z-10 relative self-start">
-                    <button type="button" id="toggle-all" class="px-4 py-2 rounded-t-xl font-extrabold text-xs sm:text-sm transition-all bg-white text-teal-600 border-t border-x border-gray-200 relative z-20" onclick="setListingType('')">Any Purpose</button>
-                    <button type="button" id="toggle-sale" class="px-4 py-2 rounded-t-xl font-extrabold text-xs sm:text-sm transition-all bg-white text-slate-400 hover:text-teal-600 border-t border-x border-b border-gray-200/80 shadow-[inset_0_-2px_3px_rgba(0,0,0,0.03)] relative z-10" onclick="setListingType('sale')">For Sale</button>
-                    <button type="button" id="toggle-rent" class="px-4 py-2 rounded-t-xl font-extrabold text-xs sm:text-sm transition-all bg-white text-slate-400 hover:text-teal-600 border-t border-x border-b border-gray-200/80 shadow-[inset_0_-2px_3px_rgba(0,0,0,0.03)] relative z-10" onclick="setListingType('rent')">For Rent</button>
+                    <button type="button" id="toggle-all" class="px-4 py-2 sm:px-5 sm:py-2.5 rounded-t-xl font-extrabold text-xs sm:text-sm transition-all bg-white text-teal-600 border-t border-x border-gray-200 relative z-20" onclick="setListingType('')">Any Purpose</button>
+                    <button type="button" id="toggle-sale" class="px-4 py-2 sm:px-5 sm:py-2.5 rounded-t-xl font-extrabold text-xs sm:text-sm transition-all bg-white text-slate-400 hover:text-teal-600 border-t border-x border-b border-gray-200/80 shadow-[inset_0_-2px_3px_rgba(0,0,0,0.03)] relative z-10" onclick="setListingType('sale')">For Sale</button>
+                    <button type="button" id="toggle-rent" class="px-4 py-2 sm:px-5 sm:py-2.5 rounded-t-xl font-extrabold text-xs sm:text-sm transition-all bg-white text-slate-400 hover:text-teal-600 border-t border-x border-b border-gray-200/80 shadow-[inset_0_-2px_3px_rgba(0,0,0,0.03)] relative z-10" onclick="setListingType('rent')">For Rent</button>
                     <input type="hidden" id="home-listing-type" value="">
                 </div>
 
@@ -635,8 +635,8 @@
             const btnSale = document.getElementById('toggle-sale');
             const btnRent = document.getElementById('toggle-rent');
             
-            const inactiveClass = 'px-5 py-2.5 rounded-t-xl font-extrabold text-sm transition-all bg-white text-slate-400 hover:text-teal-600 border-t border-x border-b border-gray-200/80 shadow-[inset_0_-2px_3px_rgba(0,0,0,0.03)] relative z-10';
-            const activeClass = 'px-5 py-2.5 rounded-t-xl font-extrabold text-sm transition-all bg-white text-teal-600 border-t border-x border-gray-200 relative z-20';
+            const inactiveClass = 'px-4 py-2 sm:px-5 sm:py-2.5 rounded-t-xl font-extrabold text-xs sm:text-sm transition-all bg-white text-slate-400 hover:text-teal-600 border-t border-x border-b border-gray-200/80 shadow-[inset_0_-2px_3px_rgba(0,0,0,0.03)] relative z-10';
+            const activeClass = 'px-4 py-2 sm:px-5 sm:py-2.5 rounded-t-xl font-extrabold text-xs sm:text-sm transition-all bg-white text-teal-600 border-t border-x border-gray-200 relative z-20';
             
             btnAll.className = (type === '') ? activeClass : inactiveClass;
             btnSale.className = (type === 'sale') ? activeClass : inactiveClass;
