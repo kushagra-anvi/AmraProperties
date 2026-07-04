@@ -16,7 +16,7 @@
             @foreach ($elements as $element)
                 {{-- "Three Dots" Separator --}}
                 @if (is_string($element))
-                    <span class="w-10 h-10 text-slate-400 flex items-center justify-center cursor-default">
+                    <span class="w-10 h-10 text-slate-400 hidden md:flex items-center justify-center cursor-default">
                         {{ $element }}
                     </span>
                 @endif
@@ -29,7 +29,11 @@
                                 {{ $page }}
                             </span>
                         @else
-                            <a href="{{ $paginator->appends(request()->query())->url($page) }}" class="w-10 h-10 rounded-xl bg-white border border-gray-200 text-slate-700 font-bold text-sm hover:bg-slate-50 hover:border-slate-300 hover:text-teal-600 active:scale-95 transition-all flex items-center justify-center shadow-sm">
+                            @php
+                                $isNeighbor = abs($page - $paginator->currentPage()) <= 1;
+                            @endphp
+                            <a href="{{ $paginator->appends(request()->query())->url($page) }}" 
+                               class="w-10 h-10 rounded-xl bg-white border border-gray-200 text-slate-700 font-bold text-sm hover:bg-slate-50 hover:border-slate-300 hover:text-teal-600 active:scale-95 transition-all {{ $isNeighbor ? 'flex' : 'hidden md:flex' }} items-center justify-center shadow-sm">
                                 {{ $page }}
                             </a>
                         @endif

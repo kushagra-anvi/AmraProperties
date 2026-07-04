@@ -42,4 +42,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Partner::class);
     }
+
+    public function submittedProperties(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Property::class, 'submitted_by_user_id');
+    }
 }

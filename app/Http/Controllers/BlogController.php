@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
+use App\Support\SeoMeta;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -17,7 +18,9 @@ class BlogController extends Controller
             ->orderByDesc('published_at')
             ->paginate(6);
 
-        return view('site.blog', compact('posts'));
+        $seo = SeoMeta::blogIndex(route('site.blog'));
+
+        return view('site.blog', compact('posts', 'seo'));
     }
 
     /**
@@ -29,6 +32,8 @@ class BlogController extends Controller
             ->where('slug', $slug)
             ->firstOrFail();
 
-        return view('site.blog-detail', compact('post'));
+        $seo = SeoMeta::blog($post, route('site.blog.show', $post->slug));
+
+        return view('site.blog-detail', compact('post', 'seo'));
     }
 }

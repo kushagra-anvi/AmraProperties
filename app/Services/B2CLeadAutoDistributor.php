@@ -30,6 +30,9 @@ class B2CLeadAutoDistributor
             B2CLeadShare::create([
                 'b2_c_lead_id' => $lead->id,
                 'partner_id' => $partner->id,
+                'recipient_type' => $partner->type === 'developer' ? 'builder' : 'agent',
+                'recipient_name' => $partner->company_name,
+                'recipient_contact' => $partner->phone,
                 'shared_by_user_id' => $userId,
                 'shared_at' => now(),
                 'remark' => 'Auto distributed by package rules: ' . ucfirst($partner->package) . ' package. Trigger: ' . $trigger . '.',

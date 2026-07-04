@@ -1,2 +1,7 @@
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /crm/
+Disallow: /partner/
+Disallow: /login
+
+Sitemap: https://www.amraproperty.com/sitemap.xml

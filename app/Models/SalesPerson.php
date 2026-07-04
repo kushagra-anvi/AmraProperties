@@ -39,4 +39,14 @@ class SalesPerson extends Model
     {
         return $this->hasMany(Partner::class, 'assigned_sales_person_id');
     }
+
+    public function followUps(): HasMany
+    {
+        return $this->hasMany(FollowUp::class);
+    }
+
+    public function b2cLeadShares(): HasMany
+    {
+        return $this->hasMany(B2CLeadShare::class);
+    }
 }

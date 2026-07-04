@@ -58,4 +58,24 @@ class Partner extends Model
     {
         return $this->hasMany(PartnerPackageReminder::class);
     }
+
+    public function properties(): HasMany
+    {
+        return $this->hasMany(Property::class);
+    }
+
+    public function assignedProperties(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Property::class, 'partner_property');
+    }
+
+    public function propertyEnquiries(): HasMany
+    {
+        return $this->hasMany(PropertyEnquiry::class);
+    }
+
+    public function sellerEnquiries(): HasMany
+    {
+        return $this->hasMany(PropertyEnquiry::class, 'seller_partner_id');
+    }
 }

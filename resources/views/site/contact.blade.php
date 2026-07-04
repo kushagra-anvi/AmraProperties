@@ -4,20 +4,20 @@
 @section('meta_description', 'Get in touch with Amra Property. Contact our agents for premium Powai flats and Lucknow villas.')
 
 @section('content')
-    <div class="pt-24 pb-20 relative">
+    <div class="pt-20 pb-10 sm:pt-24 sm:pb-20 relative">
         <!-- Ambient Glowing Core -->
         <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-teal-500/5 via-slate-50/0 to-slate-50/0 pointer-events-none"></div>
 
-        <div class="max-w-7xl mx-auto px-6 pt-16 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 pt-8 sm:pt-16 relative z-10">
             <!-- Header Block -->
-            <div class="text-center mb-16">
-                <span class="inline-flex items-center gap-1.5 bg-teal-500/10 text-teal-700 text-xs font-bold px-4 py-2 rounded-full uppercase tracking-wider mb-4">
+            <div class="text-center mb-8 sm:mb-16">
+                <span class="inline-flex items-center gap-1.5 bg-teal-500/10 text-teal-700 text-xs font-bold px-4 py-2 rounded-full uppercase tracking-wider mb-3 sm:mb-4">
                     <i data-lucide="phone-call" class="w-3.5 h-3.5" aria-hidden="true"></i> Concierge Desk
                 </span>
-                <h1 class="text-4xl md:text-5xl font-serif font-extrabold text-amra-dark mb-4">
+                <h1 class="text-2xl sm:text-3.5xl md:text-5xl font-serif font-extrabold text-amra-dark mb-4">
                     Get in <span class="text-amra-primary italic">Touch</span>
                 </h1>
-                <p class="text-slate-500 max-w-md mx-auto text-sm leading-relaxed">
+                <p class="text-slate-500 max-w-md mx-auto text-xs sm:text-sm leading-relaxed">
                     Have questions about premium luxury property options? Our dedicated consulting partners are available 24/7.
                 </p>
             </div>
@@ -26,9 +26,9 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
                 
                 <!-- Column 1: Send Message Form Block -->
-                <div class="lg:col-span-7 bg-white p-8 md:p-10 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden">
+                <div class="lg:col-span-7 bg-white p-5 sm:p-8 md:p-10 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden">
                     <div id="form-container">
-                        <h2 class="text-2xl font-serif font-bold text-slate-800 mb-6">Send A Message</h2>
+                        <h2 class="text-xl sm:text-2xl font-serif font-bold text-slate-800 mb-6">Send A Message</h2>
                         
                         <form id="contact-form" class="flex flex-col gap-6 text-left">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -143,6 +143,22 @@
         const formContainer = document.getElementById('form-container');
         const submitBtn = document.getElementById('submit-btn');
 
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedName = localStorage.getItem('amra_enquiry_name');
+            const savedEmail = localStorage.getItem('amra_enquiry_email');
+
+            if (savedName) {
+                const parts = savedName.trim().split(/\s+/);
+                if (parts.length > 0) {
+                    if (document.getElementById('first-name')) document.getElementById('first-name').value = parts[0];
+                    if (document.getElementById('last-name')) document.getElementById('last-name').value = parts.slice(1).join(' ') || parts[0];
+                }
+            }
+            if (savedEmail && document.getElementById('email')) {
+                document.getElementById('email').value = savedEmail;
+            }
+        });
+
         if (form) {
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -179,6 +195,9 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
+                        localStorage.setItem('amra_enquiry_name', `${firstName} ${lastName}`.trim());
+                        localStorage.setItem('amra_enquiry_email', email);
+
                         formContainer.classList.add('transition-all', 'duration-500', 'opacity-0');
                         
                         setTimeout(() => {

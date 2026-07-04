@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Amra Property')</title>
-    <meta name="description" content="@yield('meta_description', 'Premium flats, villas and plots in Lucknow and Mumbai.')">
+    @if(isset($seo))
+        @include('components.seo', ['seo' => $seo])
+    @else
+        <title>@yield('title', 'Amra Property')</title>
+        <meta name="description" content="@yield('meta_description', 'Premium flats, villas and plots in Lucknow and Mumbai.')">
+    @endif
     
     <link rel="icon" type="image/png" href="{{ asset('assets/images/logo.png') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/index.css') }}">
-    <script src="https://cdn.tailwindcss.com"></script>
-    
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.397.0/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     
     <script>
         tailwind.config = {
@@ -31,13 +34,63 @@
             }
         }
     </script>
+    @vite('resources/js/app.js')
+     @unless(isset($seo))
+         @yield('seo_schema')
+     @endunless
+     <style>
+         .card-zoom-img {
+             transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+         }
+         .group:hover .card-zoom-img {
+             transform: scale(1.06) !important;
+         }
+         .double-range-input {
+            -webkit-appearance: none;
+            appearance: none;
+            margin: 0;
+            padding: 0;
+            pointer-events: none;
+        }
+        .double-range-input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #0bc1b2;
+            cursor: pointer;
+            pointer-events: auto;
+            border: 2px solid #ffffff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            margin-top: -6px;
+        }
+        .double-range-input::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #0bc1b2;
+            cursor: pointer;
+            pointer-events: auto;
+            border: 2px solid #ffffff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+        .double-range-input::-webkit-slider-runnable-track {
+            background: transparent;
+            border: none;
+        }
+        .double-range-input::-moz-range-track {
+            background: transparent;
+            border: none;
+        }
+    </style>
 </head>
 <body class="bg-amra-light text-amra-dark selection:bg-amra-primary selection:text-white overflow-x-hidden font-sans min-h-screen flex flex-col">
 
     <!-- Header Navbar -->
     <nav class="fixed w-full z-50 transition-all duration-300 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            <a href="{{ route('site.home') }}" class="text-2xl font-serif font-bold text-amra-dark tracking-tight flex items-center gap-2">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+            <a href="{{ route('site.home') }}" class="text-xl sm:text-2xl font-serif font-bold text-amra-dark tracking-tight flex items-center gap-1.5 sm:gap-2">
                 <img src="{{ asset('assets/images/logo.png') }}" alt="Amra Logo" width="32" height="32" class="w-8 h-8">
                 Amra<span class="text-amra-primary">Property</span>
             </a>
@@ -51,19 +104,23 @@
             </div>
 
             <div class="hidden md:flex items-center gap-4">
+                <a href="{{ route('site.sell-property-online') }}" class="bg-amra-primary text-slate-950 hover:bg-teal-300 px-4 py-2.5 rounded-xl font-extrabold text-xs transition-all shadow-sm">Post Free Ad</a>
                 <a href="{{ route('login') }}" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-amra-primary hover:text-white transition-colors">
                     <i data-lucide="user" class="w-5 h-5"></i>
                 </a>
             </div>
 
-            <button id="hamburger-btn" class="md:hidden text-gray-600 hover:text-amra-primary transition-colors focus:outline-none" aria-label="Toggle Mobile Menu">
-                <i data-lucide="menu" class="w-6 h-6"></i>
-            </button>
+            <div class="flex items-center gap-2.5 sm:gap-3">
+                <a href="{{ route('site.sell-property-online') }}" class="bg-amra-primary text-slate-950 hover:bg-teal-300 px-3 py-2 rounded-xl font-extrabold text-[10px] transition-all shadow-sm md:hidden">Post Free Ad</a>
+                <button id="hamburger-btn" class="md:hidden text-gray-600 hover:text-amra-primary transition-colors focus:outline-none" aria-label="Toggle Mobile Menu">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
         </div>
     </nav>
 
     <!-- Mobile Drawer Navigation -->
-    <div id="mobile-menu-drawer" class="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+    <div id="mobile-menu-drawer" class="fixed inset-0 z-[200] bg-slate-900/40 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
         <div class="fixed top-0 right-0 bottom-0 w-3/4 max-w-xs bg-white shadow-2xl p-6 flex flex-col justify-between transform translate-x-full transition-transform duration-300 ease-out">
             <div>
                 <div class="flex items-center justify-between mb-8">
@@ -82,6 +139,7 @@
                     <a href="{{ route('site.blog') }}" class="{{ Route::currentRouteName() === 'site.blog' ? 'text-amra-primary font-bold text-base' : 'text-slate-600 hover:text-amra-primary font-semibold text-base' }} transition-colors">Blog</a>
                     <a href="{{ route('site.about') }}" class="{{ Route::currentRouteName() === 'site.about' ? 'text-amra-primary font-bold text-base' : 'text-slate-600 hover:text-amra-primary font-semibold text-base' }} transition-colors">About Us</a>
                     <a href="{{ route('site.contact') }}" class="{{ Route::currentRouteName() === 'site.contact' ? 'text-amra-primary font-bold text-base' : 'text-slate-600 hover:text-amra-primary font-semibold text-base' }} transition-colors">Contact</a>
+                    <a href="{{ route('site.sell-property-online') }}" class="{{ Route::currentRouteName() === 'site.sell-property-online' ? 'text-amra-primary font-bold text-base' : 'text-slate-600 hover:text-amra-primary font-semibold text-base' }} transition-colors">Post Free Ad</a>
                 </nav>
             </div>
             
@@ -141,6 +199,7 @@
                         <li><a href="{{ route('site.home') }}" class="hover:text-amra-primary transition-colors">Home</a></li>
                         <li><a href="{{ route('site.about') }}" class="hover:text-amra-primary transition-colors">About Us</a></li>
                         <li><a href="{{ route('site.property') }}" class="hover:text-amra-primary transition-colors">Property</a></li>
+                        <li><a href="{{ route('site.sell-property-online') }}" class="hover:text-amra-primary transition-colors">Post Free Ad</a></li>
                         <li><a href="{{ route('site.blog') }}" class="hover:text-amra-primary transition-colors">Blog</a></li>
                         <li><a href="{{ route('site.contact') }}" class="hover:text-amra-primary transition-colors">Contact</a></li>
                     </ul>

@@ -28,4 +28,6 @@ Thumbs.db
 *.sql
 /public/wp-content
 /amra_wp_files.zip
+/scratch/
+
 

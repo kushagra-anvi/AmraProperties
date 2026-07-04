@@ -5,12 +5,19 @@
 @section('content')
 <div class="space-y-6">
     <!-- Header Block -->
-    <div>
-        <span class="inline-flex items-center gap-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2">
-            <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> Sales Operations
-        </span>
-        <h1 class="text-3xl font-serif font-extrabold text-white">Sales Performance Tracking</h1>
-        <p class="text-sm text-slate-400">Evaluate sales team lead engagement counts, subscription conversions, and pipeline KPIs</p>
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <span class="inline-flex items-center gap-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2">
+                <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> Sales Operations
+            </span>
+            <h1 class="text-3xl font-serif font-extrabold text-white">Sales Performance Tracking</h1>
+            <p class="text-sm text-slate-400">Evaluate sales team lead engagement counts, subscription conversions, and pipeline KPIs</p>
+        </div>
+        <div>
+            <a href="{{ route('crm.sales.create') }}" class="bg-amra-primary hover:bg-teal-600 text-white font-bold text-xs px-5 py-3.5 rounded-xl transition-all shadow-md flex items-center gap-1.5 active:scale-95">
+                <i data-lucide="user-plus" class="w-4 h-4"></i> Add Sales Rep
+            </a>
+        </div>
     </div>
 
     <!-- Toolbar Filters -->
@@ -133,9 +140,14 @@
 
                             <!-- View profile -->
                             <td class="px-6 py-4 text-right">
-                                <a href="{{ route('crm.sales.show', $person->id) }}" class="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-350 hover:text-white rounded-xl transition-all inline-flex items-center gap-1" title="View details">
-                                    <i data-lucide="trending-up" class="w-4 h-4"></i> Performance Profile
-                                </a>
+                                <div class="flex justify-end items-center gap-2">
+                                    <a href="{{ route('crm.sales.edit', $person->id) }}" class="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-350 hover:text-white rounded-xl transition-all inline-flex items-center gap-1" title="Edit account">
+                                        <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                    </a>
+                                    <a href="{{ route('crm.sales.show', $person->id) }}" class="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-350 hover:text-white rounded-xl transition-all inline-flex items-center gap-1" title="View details">
+                                        <i data-lucide="trending-up" class="w-4 h-4"></i> Performance Profile
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                     @empty

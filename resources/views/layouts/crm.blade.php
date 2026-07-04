@@ -6,10 +6,9 @@
     <title>@yield('title', 'Amra CRM') - Amra Property</title>
     <link rel="icon" type="image/png" href="{{ asset('assets/images/logo.png') }}">
 
-    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -28,6 +27,7 @@
             }
         }
     </script>
+    @vite('resources/js/app.js')
     
     <style>
         html,
@@ -162,6 +162,10 @@
                     <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
                     Partner Dashboard
                 </a>
+                <a href="{{ route('crm.partner.properties.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm sidebar-link-inactive text-slate-400 hover:bg-slate-800/50 hover:text-white {{ request()->routeIs('crm.partner.properties.*') ? 'sidebar-link-active' : '' }}">
+                    <i data-lucide="home" class="w-4 h-4"></i>
+                    My Properties
+                </a>
             @endif
 
             @if ($canViewB2BModule || $canViewBuyerAndPartnerModules)
@@ -194,6 +198,20 @@
                     <i data-lucide="handshake" class="w-4 h-4"></i>
                     Agents & Developers
                 </a>
+
+                <div class="pt-4 pb-2 px-4">
+                    <span class="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Properties & Content</span>
+                </div>
+
+                <!-- Properties -->
+                <a href="{{ route('crm.properties.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm sidebar-link-inactive text-slate-400 hover:bg-slate-800/50 hover:text-white {{ request()->routeIs('crm.properties.*') ? 'sidebar-link-active' : '' }}">
+                    <i data-lucide="home" class="w-4 h-4"></i>
+                    Properties List
+                </a>
+                <a href="{{ route('crm.property-enquiries.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm sidebar-link-inactive text-slate-400 hover:bg-slate-800/50 hover:text-white {{ request()->routeIs('crm.property-enquiries.*') ? 'sidebar-link-active' : '' }}">
+                    <i data-lucide="inbox" class="w-4 h-4"></i>
+                    Property Enquiries
+                </a>
             @endif
 
             <!-- Sales Team (Admin / Super Admin Access) -->
@@ -208,8 +226,73 @@
         <!-- User Block Profile & Logout -->
         <div class="p-4 border-t border-slate-200 bg-slate-50 shrink-0">
             @php
+                $todayEnd = now()->endOfDay();
+                $b2bCount = 0;
+                $b2cCount = 0;
+                $pendingFollowupsCount = 0;
+
+                if (auth()->user()->role === 'partner') {
+                    $partner = auth()->user()->partner;
+                    if ($partner) {
+                        $followupQuery = \App\Models\FollowUp::where('followable_type', \App\Models\B2CLead::class)
+                            ->whereNull('completed_at')
+                            ->where('due_at', '<=', $todayEnd)
+                            ->where('user_id', auth()->id())
+                            ->whereIn('followable_id', function ($sub) use ($partner) {
+                                $sub->select('b2_c_lead_id')
+                                    ->from('b2_c_lead_shares')
+                                    ->where('partner_id', $partner->id);
+                            });
+                        $pendingFollowupsCount = $followupQuery->count();
+                    }
+                } else {
+                    $b2bQuery = \App\Models\FollowUp::where('followable_type', \App\Models\B2BLead::class)
+                        ->whereNull('completed_at')
+                        ->where('due_at', '<=', $todayEnd);
+
+                    $b2cQuery = \App\Models\FollowUp::where('followable_type', \App\Models\B2CLead::class)
+                        ->whereNull('completed_at')
+                        ->where('due_at', '<=', $todayEnd);
+
+                    if (auth()->user()->role === 'sales_team') {
+                        $salesPersonId = auth()->user()->salesPerson?->id;
+                        $b2bQuery->where('sales_person_id', $salesPersonId);
+                        $b2cQuery->where('sales_person_id', $salesPersonId);
+                    }
+
+                    $b2bCount = $b2bQuery->count();
+                    $b2cCount = $b2cQuery->count();
+                    $pendingFollowupsCount = $b2bCount + $b2cCount;
+                }
                 $unreadNotifications = auth()->user()->unreadNotifications()->latest()->take(3)->get();
             @endphp
+
+            @if($pendingFollowupsCount > 0)
+                <div class="mb-3 rounded-xl border border-rose-200 bg-rose-50 p-3 space-y-1.5 text-left">
+                    <div class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-rose-700">
+                        <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                        Follow-up Alerts
+                    </div>
+                    @if (auth()->user()->role === 'partner')
+                        <a href="{{ route('crm.partner.dashboard') }}" class="block text-[10px] font-extrabold text-rose-800 hover:underline leading-snug">
+                            You have {{ $pendingFollowupsCount }} pending follow-up{{ $pendingFollowupsCount > 1 ? 's' : '' }} due.
+                        </a>
+                    @else
+                        @if($b2bCount > 0)
+                            <a href="{{ route('crm.b2b.index') }}?due_only=1" class="block text-[10px] font-extrabold text-rose-850 hover:underline leading-snug flex items-center justify-between">
+                                <span>B2B Leads:</span>
+                                <span class="bg-rose-100/80 px-1.5 py-0.5 rounded text-[9px] font-extrabold text-rose-800">{{ $b2bCount }} due</span>
+                            </a>
+                        @endif
+                        @if($b2cCount > 0)
+                            <a href="{{ route('crm.b2c.index') }}?due_only=1" class="block text-[10px] font-extrabold text-rose-855 hover:underline leading-snug flex items-center justify-between">
+                                <span>B2C Buyers:</span>
+                                <span class="bg-rose-100/80 px-1.5 py-0.5 rounded text-[9px] font-extrabold text-rose-800">{{ $b2cCount }} due</span>
+                            </a>
+                        @endif
+                    @endif
+                </div>
+            @endif
 
             @if ($unreadNotifications->isNotEmpty())
                 <div class="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-3 space-y-2">

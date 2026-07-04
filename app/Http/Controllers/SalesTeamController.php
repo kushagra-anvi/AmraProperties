@@ -170,4 +170,123 @@ class SalesTeamController extends Controller
             'recentFollowUps'
         ));
     }
+
+    /**
+     * Show the form for creating a new Sales Team member.
+     */
+    public function create(): View
+    {
+        return view('crm.sales.create');
+    }
+
+    /**
+     * Store a newly created Sales Team member in storage.
+     */
+    public function store(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:6'],
+            'phone' => ['required', 'string', 'max:20'],
+            'location' => ['required', 'string', 'max:255'],
+            'service_areas' => ['nullable', 'array'],
+        ]);
+
+        \Illuminate\Support\Facades\DB::beginTransaction();
+        try {
+            $user = \App\Models\User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => \Illuminate\Support\Facades\Hash::make($validated['password']),
+                'role' => 'sales_team',
+                'phone' => $validated['phone'],
+                'location' => $validated['location'],
+                'is_active' => true,
+            ]);
+
+            SalesPerson::create([
+                'user_id' => $user->id,
+                'name' => $validated['name'],
+                'phone' => $validated['phone'],
+                'location' => $validated['location'],
+                'service_areas' => $validated['service_areas'] ?? [],
+                'is_active' => true,
+            ]);
+
+            \Illuminate\Support\Facades\DB::commit();
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            return back()->withInput()->with('error', 'Failed to create sales representative: ' . $e->getMessage());
+        }
+
+        return redirect()->route('crm.sales.index')
+            ->with('success', 'Sales representative successfully created!');
+    }
+
+    /**
+     * Show the form for editing the specified Sales Team member.
+     */
+    public function edit(SalesPerson $salesPerson): View
+    {
+        $salesPerson->load('user');
+        return view('crm.sales.edit', compact('salesPerson'));
+    }
+
+    /**
+     * Update the specified Sales Team member in storage.
+     */
+    public function update(Request $request, SalesPerson $salesPerson): \Illuminate\Http\RedirectResponse
+    {
+        $user = $salesPerson->user;
+        $userId = $user ? $user->id : null;
+
+        $rules = [
+            'name' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'string', 'max:20'],
+            'location' => ['required', 'string', 'max:255'],
+            'service_areas' => ['nullable', 'array'],
+            'is_active' => ['required', 'boolean'],
+        ];
+
+        if ($userId) {
+            $rules['email'] = ['required', 'email', 'max:255', 'unique:users,email,' . $userId];
+            $rules['password'] = ['nullable', 'string', 'min:6'];
+        }
+
+        $validated = $request->validate($rules);
+
+        \Illuminate\Support\Facades\DB::beginTransaction();
+        try {
+            if ($userId) {
+                $userData = [
+                    'name' => $validated['name'],
+                    'email' => $validated['email'],
+                    'phone' => $validated['phone'],
+                    'location' => $validated['location'],
+                    'is_active' => $validated['is_active'],
+                ];
+                if (!empty($validated['password'])) {
+                    $userData['password'] = \Illuminate\Support\Facades\Hash::make($validated['password']);
+                }
+                $user->update($userData);
+            }
+
+            $salesPerson->update([
+                'name' => $validated['name'],
+                'phone' => $validated['phone'],
+                'location' => $validated['location'],
+                'service_areas' => $validated['service_areas'] ?? [],
+                'is_active' => $validated['is_active'],
+            ]);
+
+            \Illuminate\Support\Facades\DB::commit();
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            return back()->withInput()->with('error', 'Failed to update sales representative: ' . $e->getMessage());
+        }
+
+        return redirect()->route('crm.sales.show', $salesPerson->id)
+            ->with('success', 'Sales representative successfully updated!');
+    }
 }

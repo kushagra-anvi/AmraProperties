@@ -23,7 +23,7 @@
                 <div>
                     <h1 class="text-2xl md:text-3xl font-serif font-extrabold text-slate-800">{{ $lead->name }}</h1>
                     <p class="text-sm text-slate-500 mt-1 flex items-center gap-1.5">
-                        <i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i> Lead Shared: <strong class="text-slate-600 font-semibold">{{ $share->shared_at->format('d M Y, h:i A') }}</strong>
+                        <i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i> Lead Received: <strong class="text-slate-600 font-semibold">{{ $share->shared_at->format('d M Y, h:i A') }}</strong>
                     </p>
                     <div class="flex items-center gap-4 mt-3 text-xs text-slate-400">
                         <span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> {{ $lead->city }}</span>
@@ -33,9 +33,9 @@
 
             <!-- Lead Shared Status Pill -->
             <div class="flex flex-col items-start md:items-end gap-2">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Shared Status</span>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Lead Status</span>
                 <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-teal-50 border border-teal-200 text-teal-700">
-                    ● Active Lead
+                    ● {{ ['new' => 'New', 'shared' => 'Shared', 'contacted' => 'Contacted', 'follow_up' => 'Follow-up', 'site_visit_scheduled' => 'Site Visit Scheduled', 'interested' => 'Interested', 'closed_won' => 'Closed/Won', 'closed_lost' => 'Closed/Lost', 'filtered' => 'New'][$lead->status] ?? ucfirst(str_replace('_', ' ', $lead->status)) }}
                 </span>
             </div>
         </div>
@@ -94,25 +94,42 @@
             </div>
 
             <!-- Notes & Remarks Panel -->
-            @if ($share->remark || $lead->remark)
+            @if ($lead->remark)
                 <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-md space-y-4">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2.5">Shared Remarks</h3>
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2.5">Received Remarks</h3>
                     
-                    @if ($share->remark)
-                        <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl">
-                            <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Admin Share Notes</span>
-                            <p class="text-xs text-slate-700 mt-1 leading-relaxed">"{{ $share->remark }}"</p>
-                        </div>
-                    @endif
-
-                    @if ($lead->remark)
-                        <div class="bg-teal-50/20 border border-teal-100 p-4 rounded-xl">
-                            <span class="text-[9px] font-bold text-teal-600 uppercase tracking-widest">Additional Discovery Remarks</span>
-                            <p class="text-xs text-slate-700 mt-1 leading-relaxed">{{ $lead->remark }}</p>
-                        </div>
-                    @endif
+                    <div class="bg-teal-50/20 border border-teal-100 p-4 rounded-xl">
+                        <span class="text-[9px] font-bold text-teal-600 uppercase tracking-widest">Additional Discovery Remarks</span>
+                        <p class="text-xs text-slate-700 mt-1 leading-relaxed">{{ $lead->remark }}</p>
+                    </div>
                 </div>
             @endif
+
+            <!-- My Remark History -->
+            <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-md space-y-4">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2.5">My Remark History</h3>
+                <div class="space-y-4">
+                    @forelse ($share->remarks as $hist)
+                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+                                <span class="flex items-center gap-1">
+                                    <i data-lucide="user" class="w-3.5 h-3.5 text-slate-400"></i>
+                                    {{ $hist->user?->name ?? 'You' }}
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-400"></i>
+                                    {{ $hist->created_at->format('d M Y, h:i A') }}
+                                </span>
+                            </div>
+                            <p class="text-xs text-slate-700 leading-relaxed font-medium">
+                                {{ $hist->remark }}
+                            </p>
+                        </div>
+                    @empty
+                        <p class="text-xs text-slate-400 italic pl-1">No remarks logged yet.</p>
+                    @endforelse
+                </div>
+            </div>
         </div>
 
         <!-- Right Column: Buyer Contact Details (4/12 width) -->
@@ -153,6 +170,81 @@
                         </a>
                     </div>
                 </div>
+            </div>
+
+            <!-- Add a Remark -->
+            <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-md space-y-4 text-left">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2.5">Add a Remark</h3>
+                <form action="{{ route('crm.partner.leads.remark', $lead->id) }}" method="POST" class="space-y-3">
+                    @csrf
+                    <div>
+                        <textarea name="remark" rows="3" placeholder="Enter private follow-up remarks..." required
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-teal-500 transition-all text-xs font-medium text-slate-800">{{ old('remark') }}</textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs py-2.5 rounded-xl transition-all shadow-sm">
+                        Submit Remark
+                    </button>
+                </form>
+            </div>
+
+            <!-- Follow-up Tasks -->
+            <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-md space-y-4">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2.5">Follow-up Tasks</h3>
+                <div class="space-y-3">
+                    @forelse ($lead->followUps as $fu)
+                        <div class="p-3 rounded-xl border {{ $fu->completed_at ? 'border-slate-100 bg-slate-50/50 text-slate-500' : 'border-rose-100 bg-rose-50/50 text-slate-700' }}">
+                            <div class="flex items-center justify-between text-[9px] font-bold uppercase tracking-wider mb-1.5">
+                                <span class="flex items-center gap-1">
+                                    <i data-lucide="clock" class="w-3 h-3 text-slate-400"></i>
+                                    {{ $fu->due_at ? $fu->due_at->format('d M Y, h:i A') : 'No date' }}
+                                </span>
+                                @if($fu->completed_at)
+                                    <span class="text-teal-600">✓ Completed</span>
+                                @else
+                                    <span class="text-rose-600">● Due Pending</span>
+                                @endif
+                            </div>
+                            <p class="text-xs leading-normal font-medium">"{{ $fu->notes }}"</p>
+                            @if(!$fu->completed_at)
+                                <form action="{{ route('crm.partner.leads.followup.complete', $fu->id) }}" method="POST" class="mt-2.5 flex gap-2">
+                                    @csrf
+                                    <input type="text" name="outcome" placeholder="Outcome (e.g. Spoke to buyer)..." required
+                                        class="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-[10px] text-slate-800 outline-none focus:border-teal-500 transition-colors">
+                                    <button type="submit" class="bg-slate-800 hover:bg-slate-700 text-white px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase shrink-0">
+                                        Complete
+                                    </button>
+                                </form>
+                            @else
+                                <div class="mt-2 text-[10px] italic text-slate-400">
+                                    Outcome: {{ $fu->outcome ?? 'Done' }} (at {{ $fu->completed_at->format('d M, h:i A') }})
+                                </div>
+                            @endif
+                        </div>
+                    @empty
+                        <p class="text-xs text-slate-450 italic pl-1">No follow-up reminders scheduled.</p>
+                    @endforelse
+                </div>
+            </div>
+
+            <!-- Schedule Followup -->
+            <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-md space-y-4 text-left">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2.5">Schedule Follow-up</h3>
+                <form action="{{ route('crm.partner.leads.followup', $lead->id) }}" method="POST" class="space-y-3">
+                    @csrf
+                    <div>
+                        <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Due Date & Time</label>
+                        <input type="datetime-local" name="due_at" required
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-teal-500 transition-all text-xs font-medium text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Follow-up Notes</label>
+                        <textarea name="notes" rows="2" placeholder="e.g. Call to discuss pricing"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-teal-500 transition-all text-xs font-medium text-slate-800"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs py-2.5 rounded-xl transition-all shadow-sm">
+                        Schedule Reminder
+                    </button>
+                </form>
             </div>
         </div>
     </div>

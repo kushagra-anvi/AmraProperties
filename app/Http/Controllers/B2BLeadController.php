@@ -34,6 +34,15 @@ class B2BLeadController extends Controller
         }
 
         // Apply filters
+        if ($request->boolean('due_only')) {
+            $query->whereHas('followUps', function ($q) use ($user) {
+                $q->whereNull('completed_at')
+                  ->where('due_at', '<=', now()->endOfDay());
+                if ($user->role === 'sales_team') {
+                    $q->where('sales_person_id', $user->salesPerson?->id);
+                }
+            });
+        }
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
@@ -407,6 +416,7 @@ class B2BLeadController extends Controller
             'followable_type' => B2BLead::class,
             'followable_id' => $lead->id,
             'sales_person_id' => $salesPerson ? $salesPerson->id : null,
+            'user_id' => Auth::id(),
             'due_at' => $request->input('due_at'),
             'completed_at' => $request->boolean('completed') ? now() : null,
             'outcome' => $request->input('outcome'),

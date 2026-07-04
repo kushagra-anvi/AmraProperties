@@ -190,17 +190,22 @@ class DashboardController extends Controller
         }
 
         // Best Sales Representatives Performance Ranking
-        $salesPeople = SalesPerson::where('is_active', true)->get();
+        $salesPeople = SalesPerson::where('is_active', true)
+            ->withCount([
+                'b2bLeads as assigned_count',
+                'b2bLeads as conversions' => function ($query) {
+                    $query->whereIn('status', ['free_listing', 'paid_listing', 'converted']);
+                },
+                'followUps as calls_count'
+            ])
+            ->with(['partners' => function ($query) {
+                $query->select('id', 'assigned_sales_person_id', 'package', 'paid_amount');
+            }])
+            ->get();
+
         $salesPeople->transform(function ($person) {
-            $leadsQuery = B2BLead::where('assigned_sales_person_id', $person->id);
-            $person->assigned_count = $leadsQuery->count();
-            $person->conversions = (clone $leadsQuery)->whereIn('status', ['free_listing', 'paid_listing', 'converted'])->count();
-            $person->calls_count = FollowUp::where('sales_person_id', $person->id)->count();
-            
-            // Total pricing mapping: Starter = 15k, Growth = 45k
-            $partners = Partner::where('assigned_sales_person_id', $person->id)->get();
             $person->sales_value = 0;
-            foreach ($partners as $partner) {
+            foreach ($person->partners as $partner) {
                 if ($partner->paid_amount !== null) {
                     $person->sales_value += $partner->paid_amount;
                 } elseif ($partner->package === 'starter') {

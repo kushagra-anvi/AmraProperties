@@ -28,7 +28,7 @@ class ContactFormController extends Controller
             $message = $validated['message'];
 
             // Smart Property Preference Extractor
-            $propertyType = 'flat'; // Default fallback
+            $propertyType = null;
             $messageLower = strtolower($message);
 
             if (str_contains($messageLower, 'villa') || str_contains($messageLower, 'house') || str_contains($messageLower, 'independent')) {
@@ -40,7 +40,7 @@ class ContactFormController extends Controller
             }
 
             // Smart Configuration Extractor
-            $configuration = '2BHK'; // Default fallback
+            $configuration = null;
             if (str_contains($messageLower, '1bhk') || str_contains($messageLower, '1 bhk')) {
                 $configuration = '1BHK';
             } elseif (str_contains($messageLower, '2bhk') || str_contains($messageLower, '2 bhk')) {
@@ -70,7 +70,7 @@ class ContactFormController extends Controller
             }
 
             // Extract city
-            $city = 'Mumbai'; // Default fallback
+            $city = null;
             if (str_contains($messageLower, 'lucknow')) {
                 $city = 'Lucknow';
             } elseif (str_contains($messageLower, 'pune')) {
@@ -81,15 +81,15 @@ class ContactFormController extends Controller
                 $city = 'Bangalore';
             }
 
-            // Preferred locations (extract from comma separation or use city)
-            $locations = [$city];
+            // Preferred locations (extract from message when a known city is mentioned)
+            $locations = array_filter([$city]);
             
             // Create B2C Lead
             $lead = B2CLead::create([
                 'source_platform' => 'website',
                 'lead_created_at' => now(),
                 'name' => $fullName,
-                'phone' => $validated['phone'] ?? '+91 99999 88888', // Fallback phone for website leads
+                'phone' => $validated['phone'] ?? null, // Null is allowed and prevents duplicate conflicts
                 'email' => $validated['email'],
                 'city' => $city,
                 'budget_min' => $budgetMin,

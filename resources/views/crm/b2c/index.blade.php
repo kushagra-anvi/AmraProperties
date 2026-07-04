@@ -166,6 +166,48 @@
         </form>
     </div>
 
+    <!-- Sharing activity dashboard -->
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-md space-y-5">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+                <h2 class="text-xs font-bold text-slate-300 uppercase tracking-widest">Lead Sharing Activity</h2>
+                <p class="mt-1 text-[10px] text-slate-500">Recipient deliveries recorded within the selected period.</p>
+            </div>
+            <form method="GET" action="{{ route('crm.b2c.index') }}" class="flex flex-wrap items-end gap-2">
+                <select name="share_date_filter" id="share-date-filter" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-300">
+                    <option value="">All Time</option>
+                    <option value="today" {{ $activeFilters['share_date_filter'] === 'today' ? 'selected' : '' }}>Today</option>
+                    <option value="last_7_days" {{ $activeFilters['share_date_filter'] === 'last_7_days' ? 'selected' : '' }}>Last 7 Days</option>
+                    <option value="last_30_days" {{ $activeFilters['share_date_filter'] === 'last_30_days' ? 'selected' : '' }}>Last 30 Days</option>
+                    <option value="custom" {{ $activeFilters['share_date_filter'] === 'custom' ? 'selected' : '' }}>Custom</option>
+                </select>
+                <input type="date" name="share_start_date" value="{{ $activeFilters['share_start_date'] }}" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300">
+                <input type="date" name="share_end_date" value="{{ $activeFilters['share_end_date'] }}" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300">
+                <button class="bg-teal-500 hover:bg-teal-400 text-slate-950 rounded-xl px-4 py-2.5 text-xs font-bold">Apply Period</button>
+            </form>
+        </div>
+        <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            @foreach (['total' => 'Total Shares', 'sales_team' => 'Sales Team', 'builders' => 'Builders', 'agents' => 'Agents'] as $key => $label)
+                <div class="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
+                    <p class="text-[9px] font-bold uppercase tracking-wider text-slate-500">{{ $label }}</p>
+                    <p class="mt-1 text-2xl font-extrabold text-white">{{ $shareActivityStats[$key] }}</p>
+                </div>
+            @endforeach
+        </div>
+        <div class="overflow-x-auto rounded-xl border border-slate-800">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-slate-950 text-[9px] uppercase tracking-wider text-slate-500"><tr><th class="px-4 py-3">Shared At</th><th class="px-4 py-3">Lead</th><th class="px-4 py-3">Recipient</th><th class="px-4 py-3">Type</th><th class="px-4 py-3">Shared By</th></tr></thead>
+                <tbody class="divide-y divide-slate-800">
+                    @forelse ($recentShareActivity as $activity)
+                        <tr><td class="px-4 py-3 text-slate-400 whitespace-nowrap">{{ $activity->shared_at->format('d M Y, h:i A') }}</td><td class="px-4 py-3"><a class="font-bold text-white hover:text-teal-400" href="{{ route('crm.b2c.show', $activity->b2_c_lead_id) }}">{{ $activity->lead?->name ?? 'Deleted lead' }}</a></td><td class="px-4 py-3 text-slate-300">{{ $activity->recipient_display_name }}</td><td class="px-4 py-3 uppercase text-[9px] font-bold text-teal-400">{{ str_replace('_', ' ', $activity->recipient_type) }}</td><td class="px-4 py-3 text-slate-500">{{ $activity->sharedBy?->name ?? 'System' }}</td></tr>
+                    @empty
+                        <tr><td colspan="5" class="px-4 py-8 text-center text-slate-500">No sharing activity in this period.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <!-- Data Table -->
     <div class="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-md">
         @if (auth()->user()->role !== 'analyst')
@@ -173,7 +215,7 @@
                 @csrf
 
                 <div class="border-b border-slate-800 bg-slate-950/50 px-6 py-4">
-                    <div class="grid gap-3 lg:grid-cols-[minmax(130px,auto)_minmax(180px,240px)_1fr_auto] lg:items-end">
+                    <div class="grid gap-3 lg:grid-cols-[minmax(130px,auto)_minmax(180px,240px)_1fr_auto_auto] lg:items-end">
                         <div class="rounded-xl border border-slate-800 bg-slate-950 px-4 py-3">
                             <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Selected Leads</p>
                             <p class="mt-1 text-sm font-extrabold text-white"><span id="bulk-selected-count">0</span> selected</p>
@@ -195,9 +237,12 @@
                                 class="w-full rounded-xl border border-slate-800 bg-slate-950 px-4 py-3 text-xs font-medium text-slate-200 outline-none transition-all focus:border-amra-primary">
                         </div>
 
-                        <button id="bulk-assign-submit" type="submit" disabled class="inline-flex h-[42px] items-center justify-center gap-2 rounded-xl bg-amra-primary px-4 text-xs font-extrabold text-slate-950 shadow-lg shadow-teal-500/10 transition-all hover:bg-teal-400 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500 disabled:shadow-none">
+                        <button id="bulk-assign-submit" type="submit" disabled class="inline-flex h-[42px] items-center justify-center gap-2 rounded-xl bg-amra-primary px-4 text-xs font-extrabold text-slate-950 shadow-lg shadow-teal-500/10 transition-all hover:bg-teal-400 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none">
                             <i data-lucide="user-check" class="w-4 h-4"></i>
                             Assign Selected
+                        </button>
+                        <button id="bulk-share-open" type="button" disabled onclick="toggleModal('b2c-bulk-share-modal')" class="inline-flex h-[42px] items-center justify-center gap-2 rounded-xl bg-indigo-500 px-4 text-xs font-extrabold text-white transition-all hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-40">
+                            <i data-lucide="share-2" class="w-4 h-4"></i> Share Selected
                         </button>
                     </div>
                 </div>
@@ -341,7 +386,7 @@
 
                             <!-- Shared Status -->
                             <td class="px-6 py-4">
-                                @php $shareCount = $lead->shares()->count(); @endphp
+                                @php $shareCount = $lead->shares_count; @endphp
                                 @if ($shareCount > 0)
                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-teal-500/10 text-teal-400 border border-teal-500/20">
                                         <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
@@ -397,6 +442,42 @@
 </div>
 
 @if (auth()->user()->role !== 'analyst')
+<!-- Bulk lead sharing modal -->
+<div id="b2c-bulk-share-modal" class="fixed inset-0 z-50 overflow-y-auto flex items-start justify-center p-4 hidden">
+    <div class="fixed inset-0 bg-black/75 backdrop-blur-sm" onclick="toggleModal('b2c-bulk-share-modal')"></div>
+    <div class="relative z-10 my-8 w-full max-w-2xl rounded-3xl border border-slate-800 bg-slate-900 p-6 shadow-2xl">
+        <div class="mb-5 flex items-center justify-between">
+            <div><h3 class="text-lg font-serif font-extrabold text-white">Bulk Lead Sharing</h3><p class="text-[10px] text-slate-500">Each selected lead will be shared with every selected recipient.</p></div>
+            <button type="button" onclick="toggleModal('b2c-bulk-share-modal')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <form id="bulk-share-form" action="{{ route('crm.b2c.bulk-share') }}" method="POST" class="space-y-5">
+            @csrf
+            <div id="bulk-share-lead-inputs"></div>
+            <div class="grid gap-5 md:grid-cols-2">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Sales Team</label>
+                    <div class="max-h-56 space-y-2 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950 p-3">
+                        @foreach ($salesPeople as $person)
+                            <label class="flex items-center gap-2 rounded-lg border border-slate-800 p-2 text-xs text-slate-200"><input type="checkbox" name="sales_person_ids[]" value="{{ $person->id }}" class="rounded bg-slate-900 text-teal-500"> {{ $person->name }}</label>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Builders & Agents</label>
+                    <div class="max-h-56 space-y-2 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950 p-3">
+                        @foreach ($partners as $partner)
+                            <label class="flex items-center gap-2 rounded-lg border border-slate-800 p-2 text-xs text-slate-200"><input type="checkbox" name="partner_ids[]" value="{{ $partner->id }}" class="rounded bg-slate-900 text-teal-500"><span class="truncate">{{ $partner->company_name }}</span><span class="ml-auto text-[8px] font-bold uppercase text-slate-500">{{ $partner->type === 'developer' ? 'Builder' : 'Agent' }}</span></label>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            <textarea name="remark" rows="3" placeholder="Optional sharing note..." class="w-full rounded-xl border border-slate-800 bg-slate-950 px-4 py-3 text-xs text-slate-200 focus:border-amra-primary"></textarea>
+            @error('recipients')<p class="text-xs font-bold text-rose-400">{{ $message }}</p>@enderror
+            <button type="submit" class="w-full rounded-xl bg-indigo-500 py-3.5 text-xs font-bold text-white hover:bg-indigo-400">Share Selected Leads</button>
+        </form>
+    </div>
+</div>
+
 <!-- Bulk CSV Import Modal -->
 <div id="b2c-csv-modal" class="fixed inset-0 z-50 overflow-y-auto flex items-start justify-center p-4 hidden">
     <!-- Modal Backdrop -->
@@ -485,11 +566,16 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         toggleCustomDates();
+        @if ($errors->has('recipients'))
+            toggleModal('b2c-bulk-share-modal');
+        @endif
 
         const selectAll = document.getElementById('select-all-leads');
         const leadCheckboxes = Array.from(document.querySelectorAll('.lead-checkbox'));
         const selectedCount = document.getElementById('bulk-selected-count');
         const submitButton = document.getElementById('bulk-assign-submit');
+        const bulkShareButton = document.getElementById('bulk-share-open');
+        const bulkShareForm = document.getElementById('bulk-share-form');
         const bulkForm = document.getElementById('bulk-assign-form');
 
         function updateBulkControls() {
@@ -501,6 +587,9 @@
 
             if (submitButton) {
                 submitButton.disabled = checkedCount === 0;
+            }
+            if (bulkShareButton) {
+                bulkShareButton.disabled = checkedCount === 0;
             }
 
             if (selectAll) {
@@ -529,6 +618,25 @@
                     event.preventDefault();
                     updateBulkControls();
                 }
+            });
+        }
+
+        if (bulkShareForm) {
+            bulkShareForm.addEventListener('submit', (event) => {
+                const selected = leadCheckboxes.filter((checkbox) => checkbox.checked);
+                if (selected.length === 0) {
+                    event.preventDefault();
+                    return;
+                }
+                const inputContainer = document.getElementById('bulk-share-lead-inputs');
+                inputContainer.innerHTML = '';
+                selected.forEach((checkbox) => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'lead_ids[]';
+                    input.value = checkbox.value;
+                    inputContainer.appendChild(input);
+                });
             });
         }
 

@@ -4,32 +4,32 @@
 @section('meta_description', Str::limit(strip_tags($post->content), 150))
 
 @section('content')
-<div class="pt-32 pb-24 bg-amra-light">
-    <div class="max-w-4xl mx-auto px-6">
+<div class="pt-24 pb-12 sm:pt-32 sm:pb-24 bg-amra-light">
+    <div class="max-w-4xl mx-auto px-4 md:px-6">
         
         <!-- Back Navigation -->
-        <div class="mb-8">
+        <div class="mb-6 sm:mb-8">
             <a href="{{ route('site.blog') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-teal-600 hover:text-teal-700 transition-colors">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Blog
             </a>
         </div>
 
-        <article class="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 p-6 md:p-10">
+        <article class="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 p-5 sm:p-8 md:p-10">
             <!-- Article Header -->
-            <header class="mb-8">
-                <div class="flex items-center gap-2 mb-4">
+            <header class="mb-6 sm:mb-8">
+                <div class="flex items-center gap-2 mb-3 sm:mb-4">
                     <span class="bg-slate-100 text-slate-600 text-[10px] font-semibold px-2.5 py-1 rounded-md">
                         Published on {{ $post->published_at ? $post->published_at->format('M d, Y') : $post->created_at->format('M d, Y') }}
                     </span>
                 </div>
-                <h1 class="text-3xl md:text-4xl font-serif font-bold text-amra-dark leading-snug">
+                <h1 class="text-2xl sm:text-3.5xl md:text-4xl font-serif font-bold text-amra-dark leading-snug">
                     {{ $post->title }}
                 </h1>
             </header>
 
             <!-- Featured Image -->
             @if($post->featured_image)
-                <div class="relative h-[300px] md:h-[450px] w-full rounded-2xl overflow-hidden mb-10 bg-slate-50 shadow-inner">
+                <div class="relative h-[200px] sm:h-[300px] md:h-[450px] w-full rounded-2xl overflow-hidden mb-8 sm:mb-10 bg-slate-50 shadow-inner">
                     <img src="{{ asset($post->featured_image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover">
                 </div>
             @endif

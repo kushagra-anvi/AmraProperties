@@ -9,10 +9,12 @@ use App\Models\Partner;
 use App\Models\LeadStatusLog;
 use App\Models\SalesPerson;
 use App\Services\B2CLeadAutoDistributor;
+use App\Services\B2CLeadSharingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Illuminate\Validation\ValidationException;
 
 class B2CLeadController extends Controller
 {
@@ -22,7 +24,17 @@ class B2CLeadController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = B2CLead::with('assignedSalesPerson');
+        $query = B2CLead::with('assignedSalesPerson')->withCount('shares');
+
+        if ($request->boolean('due_only')) {
+            $query->whereHas('followUps', function ($q) {
+                $q->whereNull('completed_at')
+                  ->where('due_at', '<=', now()->endOfDay());
+                if (auth()->user()->role === 'sales_team') {
+                    $q->where('sales_person_id', auth()->user()->salesPerson?->id);
+                }
+            });
+        }
 
         // Search name, phone, email
         if ($request->filled('search')) {
@@ -80,10 +92,31 @@ class B2CLeadController extends Controller
 
         $leads = $query->orderByDesc('lead_created_at')->paginate(15)->withQueryString();
         $salesPeople = SalesPerson::where('is_active', true)->orderBy('name')->get();
+        $partners = Partner::where('is_active', true)->orderBy('company_name')->get();
+
+        $shareFilter = $request->input('share_date_filter');
+        $shareStartDate = $request->input('share_start_date');
+        $shareEndDate = $request->input('share_end_date');
+        $shareActivityQuery = B2CLeadShare::query();
+        DateFilterHelper::apply($shareActivityQuery, $shareFilter, 'shared_at', $shareStartDate, $shareEndDate);
+        $shareActivityStats = [
+            'total' => (clone $shareActivityQuery)->count(),
+            'sales_team' => (clone $shareActivityQuery)->where('recipient_type', 'sales_team')->count(),
+            'builders' => (clone $shareActivityQuery)->where('recipient_type', 'builder')->count(),
+            'agents' => (clone $shareActivityQuery)->where('recipient_type', 'agent')->count(),
+        ];
+        $recentShareActivity = (clone $shareActivityQuery)
+            ->with(['lead', 'partner', 'salesPerson', 'sharedBy'])
+            ->orderByDesc('shared_at')
+            ->limit(10)
+            ->get();
 
         return view('crm.b2c.index', [
             'leads' => $leads,
             'salesPeople' => $salesPeople,
+            'partners' => $partners,
+            'shareActivityStats' => $shareActivityStats,
+            'recentShareActivity' => $recentShareActivity,
             'activeFilters' => [
                 'search' => $request->input('search'),
                 'city' => $request->input('city'),
@@ -98,6 +131,9 @@ class B2CLeadController extends Controller
                 'date_filter' => $filter,
                 'start_date' => $startDate,
                 'end_date' => $endDate,
+                'share_date_filter' => $shareFilter,
+                'share_start_date' => $shareStartDate,
+                'share_end_date' => $shareEndDate,
             ]
         ]);
     }
@@ -205,7 +241,7 @@ class B2CLeadController extends Controller
      */
     public function show(B2CLead $lead): View
     {
-        $lead->load(['shares.partner', 'shares.sharedBy', 'statusLogs.changedByUser', 'assignedSalesPerson']);
+        $lead->load(['shares.partner', 'shares.salesPerson', 'shares.sharedBy', 'statusLogs.changedByUser', 'assignedSalesPerson', 'followUps.salesPerson']);
         
         // Load active partners that are agents/developers for the Lead Sharing list
         $partners = Partner::where('is_active', true)->orderBy('company_name')->get();
@@ -258,7 +294,7 @@ class B2CLeadController extends Controller
     }
 
     /**
-     * Share B2C Lead with selected Partners.
+     * Share a B2C lead with selected sales team members, builders, or agents.
      */
     public function share(Request $request, B2CLead $lead): RedirectResponse
     {
@@ -266,52 +302,76 @@ class B2CLeadController extends Controller
             abort(403, 'Analysts cannot distribute leads.');
         }
 
-        $request->validate([
-            'partner_ids' => ['required', 'array'],
+        $validated = $request->validate([
+            'partner_ids' => ['nullable', 'array'],
             'partner_ids.*' => ['exists:partners,id'],
+            'sales_person_ids' => ['nullable', 'array'],
+            'sales_person_ids.*' => ['exists:sales_people,id'],
             'remark' => ['nullable', 'string'],
         ]);
 
-        $partnerIds = $request->input('partner_ids');
-        $remark = $request->input('remark');
-        $shareCount = 0;
+        $this->ensureRecipientsSelected($validated);
+        $shareCount = app(B2CLeadSharingService::class)->share(
+            collect([$lead]),
+            $validated['partner_ids'] ?? [],
+            $validated['sales_person_ids'] ?? [],
+            Auth::id(),
+            $validated['remark'] ?? null
+        );
 
-        foreach ($partnerIds as $partnerId) {
-            // Check if already shared to avoid duplicates
-            $exists = B2CLeadShare::where('b2_c_lead_id', $lead->id)
-                ->where('partner_id', $partnerId)
-                ->exists();
+        return back()->with('success', "Lead shared successfully in {$shareCount} recipient delivery(s).");
+    }
 
-            if (!$exists) {
-                B2CLeadShare::create([
-                    'b2_c_lead_id' => $lead->id,
-                    'partner_id' => $partnerId,
-                    'shared_by_user_id' => Auth::id(),
-                    'shared_at' => now(),
-                    'remark' => $remark,
-                ]);
-                $shareCount++;
-            }
+    public function bulkShare(Request $request): RedirectResponse
+    {
+        if (Auth::user()->role === 'analyst') {
+            abort(403, 'Analysts cannot share leads.');
         }
 
-        if ($shareCount > 0) {
-            // Update lead status to shared once distribution starts.
-            if (in_array($lead->status, ['new', 'filtered'], true)) {
-                $oldStatus = $lead->status;
-                $lead->update(['status' => 'shared']);
+        $validated = $request->validate([
+            'lead_ids' => ['required', 'array', 'min:1'],
+            'lead_ids.*' => ['integer', 'exists:b2_c_leads,id'],
+            'partner_ids' => ['nullable', 'array'],
+            'partner_ids.*' => ['integer', 'exists:partners,id'],
+            'sales_person_ids' => ['nullable', 'array'],
+            'sales_person_ids.*' => ['integer', 'exists:sales_people,id'],
+            'remark' => ['nullable', 'string'],
+        ]);
+        $this->ensureRecipientsSelected($validated);
 
-                LeadStatusLog::create([
-                    'lead_type' => B2CLead::class,
-                    'lead_id' => $lead->id,
-                    'from_status' => $oldStatus,
-                    'to_status' => 'shared',
-                    'changed_by_user_id' => Auth::id(),
-                    'notes' => "Lead distributed to {$shareCount} partner(s). Status bumped to Shared.",
-                ]);
-            }
+        $leads = B2CLead::whereIn('id', $validated['lead_ids'])->get();
+        $shareCount = app(B2CLeadSharingService::class)->share(
+            $leads,
+            $validated['partner_ids'] ?? [],
+            $validated['sales_person_ids'] ?? [],
+            Auth::id(),
+            $validated['remark'] ?? null
+        );
+
+        return back()->with('success', $leads->count() . " lead(s) shared in {$shareCount} recipient delivery(s).");
+    }
+
+    public function updateStatus(Request $request, B2CLead $lead): RedirectResponse
+    {
+        $validated = $request->validate([
+            'status' => ['required', 'in:new,shared,contacted,follow_up,site_visit_scheduled,interested,closed_won,closed_lost'],
+            'notes' => ['nullable', 'string'],
+        ]);
+
+        $oldStatus = $lead->status;
+        if ($oldStatus !== $validated['status']) {
+            $lead->update(['status' => $validated['status']]);
+            LeadStatusLog::create([
+                'lead_type' => B2CLead::class,
+                'lead_id' => $lead->id,
+                'from_status' => $oldStatus,
+                'to_status' => $validated['status'],
+                'changed_by_user_id' => Auth::id(),
+                'notes' => $validated['notes'] ?? 'Lead stage updated.',
+            ]);
         }
 
-        return back()->with('success', "Lead shared successfully with {$shareCount} partner(s).");
+        return back()->with('success', 'Lead status updated successfully.');
     }
 
     /**
@@ -418,5 +478,65 @@ class B2CLeadController extends Controller
         }
 
         return back()->with('success', $leads->count() . ' B2C buyer lead(s) assigned to ' . $targetName . '.');
+    }
+
+    private function ensureRecipientsSelected(array $validated): void
+    {
+        if (empty($validated['partner_ids']) && empty($validated['sales_person_ids'])) {
+            throw ValidationException::withMessages([
+                'recipients' => 'Select at least one Sales Team member, Builder, or Agent.',
+            ]);
+        }
+    }
+
+    /**
+     * Add a follow up to a B2C Lead.
+     */
+    public function logFollowUp(Request $request, B2CLead $lead): RedirectResponse
+    {
+        $user = Auth::user();
+
+        // RBAC Check
+        if ($user->role === 'sales_team') {
+            $salesPerson = $user->salesPerson;
+            if (!$salesPerson || $lead->assigned_sales_person_id !== $salesPerson->id) {
+                abort(403);
+            }
+        }
+
+        $request->validate([
+            'notes' => ['required', 'string'],
+            'due_at' => ['nullable', 'date'],
+            'outcome' => ['nullable', 'string', 'max:255'],
+            'completed' => ['boolean'],
+        ]);
+
+        $salesPerson = $lead->assignedSalesPerson;
+
+        \App\Models\FollowUp::create([
+            'followable_type' => B2CLead::class,
+            'followable_id' => $lead->id,
+            'sales_person_id' => $salesPerson ? $salesPerson->id : null,
+            'user_id' => Auth::id(),
+            'due_at' => $request->input('due_at'),
+            'completed_at' => $request->boolean('completed') ? now() : null,
+            'outcome' => $request->input('outcome'),
+            'notes' => $request->input('notes'),
+        ]);
+
+        return back()->with('success', 'Follow-up reminder successfully scheduled.');
+    }
+
+    /**
+     * Mark a follow up as completed.
+     */
+    public function completeFollowUp(Request $request, \App\Models\FollowUp $followUp): RedirectResponse
+    {
+        $followUp->update([
+            'completed_at' => now(),
+            'outcome' => $request->input('outcome', 'Completed'),
+        ]);
+
+        return back()->with('success', 'Follow-up successfully completed.');
     }
 }

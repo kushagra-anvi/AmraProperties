@@ -138,9 +138,30 @@ class PartnerImportController extends Controller
                 if (isset($data['paid_amount']) && is_numeric($data['paid_amount'])) {
                     $paidAmount = floatval($data['paid_amount']);
                 }
+
+                // Eagerly provision portal access user account if email is provided
+                $userId = null;
+                $email = $data['email'] ?? null;
+                if (!empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $existingUser = \App\Models\User::where('email', $email)->first();
+                    if (!$existingUser) {
+                        $user = \App\Models\User::create([
+                            'name' => $data['contact_person'] ?? 'Unknown',
+                            'email' => $email,
+                            'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                            'role' => 'partner',
+                            'phone' => $data['phone'] ?? null,
+                            'is_active' => true,
+                        ]);
+                        $userId = $user->id;
+                    } elseif ($existingUser->role === 'partner') {
+                        $userId = $existingUser->id;
+                    }
+                }
     
                 // Create Partner Account
                 Partner::create([
+                    'user_id' => $userId,
                     'type' => $type,
                     'company_name' => $data['company_name'],
                     'contact_person' => $data['contact_person'] ?? 'Unknown',

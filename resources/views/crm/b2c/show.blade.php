@@ -117,7 +117,10 @@
 
             <!-- Distribution / Sharing Log -->
             <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-md space-y-4">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-800 pb-2.5">Lead Distribution Log</h3>
+                <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Lead Sharing History</h3>
+                    <span class="rounded-full border border-teal-500/20 bg-teal-500/10 px-2.5 py-1 text-[10px] font-bold text-teal-400">{{ $lead->shares->count() }} total shares</span>
+                </div>
                 
                 <div class="space-y-4 max-h-96 overflow-y-auto pr-2">
                     @forelse ($lead->shares as $share)
@@ -125,33 +128,42 @@
                             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-850/60 pb-2 mb-2 text-xs">
                                 <div class="flex items-center gap-2">
                                     <div class="w-7 h-7 rounded-lg bg-teal-500/10 text-teal-400 flex items-center justify-center font-bold text-xs uppercase shrink-0">
-                                        {{ substr($share->partner->company_name, 0, 1) }}
+                                        {{ substr($share->recipient_display_name, 0, 1) }}
                                     </div>
                                     <div>
-                                        <strong class="text-white text-xs">{{ $share->partner->company_name }}</strong>
-                                        <span class="text-[9px] font-bold text-slate-550 uppercase tracking-wider block">{{ $share->partner->type }}</span>
+                                        <strong class="text-white text-xs">{{ $share->recipient_display_name }}</strong>
+                                        <span class="text-[9px] font-bold text-slate-550 uppercase tracking-wider block">{{ str_replace('_', ' ', $share->recipient_type) }}</span>
                                     </div>
                                 </div>
                                 <div class="text-[9px] font-bold text-slate-500 uppercase text-left sm:text-right shrink-0">
                                     Shared: {{ $share->shared_at->format('d M Y, h:i A') }}
                                 </div>
                             </div>
-                            
+                            @if ($share->admin_notes)
+                                <div class="mt-2 text-xs p-2.5 rounded-lg bg-slate-900 border border-slate-800">
+                                    <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Admin Share Notes</span>
+                                    <span class="text-slate-350 leading-relaxed italic">"{{ $share->admin_notes }}"</span>
+                                </div>
+                            @endif
+
                             @if ($share->remark)
-                                <p class="text-xs text-slate-350 leading-relaxed italic bg-slate-950/50 p-2.5 rounded-lg border border-slate-850 mt-2">
-                                    "{{ $share->remark }}"
-                                </p>
+                                <div class="mt-2 text-xs p-2.5 rounded-lg bg-teal-950/20 border border-teal-900/30">
+                                    <span class="text-[9px] font-bold text-teal-400 uppercase tracking-widest block mb-1">Partner Feedback Remarks</span>
+                                    <span class="text-slate-200 leading-relaxed italic">"{{ $share->remark }}"</span>
+                                </div>
                             @endif
 
                             <div class="flex items-center justify-between text-[10px] text-slate-500 font-semibold mt-2.5 pt-2 border-t border-slate-850/40">
                                 <span class="flex items-center gap-1"><i data-lucide="user-check" class="w-3.5 h-3.5"></i> Distributed by: {{ $share->sharedBy ? $share->sharedBy->name : 'System' }}</span>
-                                <span class="flex items-center gap-1 text-teal-400"><i data-lucide="smartphone" class="w-3.5 h-3.5"></i> Call Partner: {{ $share->partner->phone }}</span>
+                                @if ($share->recipient_contact)
+                                    <span class="flex items-center gap-1 text-teal-400"><i data-lucide="smartphone" class="w-3.5 h-3.5"></i> {{ $share->recipient_contact }}</span>
+                                @endif
                             </div>
                         </div>
                     @empty
                         <div class="text-center py-10 space-y-2">
                             <i data-lucide="alert-circle" class="w-8 h-8 text-slate-650 mx-auto"></i>
-                            <p class="text-xs text-slate-550">This buyer lead has not been distributed to any developer or agent partner yet.</p>
+                            <p class="text-xs text-slate-550">This buyer lead has not been shared yet.</p>
                         </div>
                     @endforelse
                 </div>
@@ -164,6 +176,20 @@
             
             <!-- Lead Sharing Dashboard Panel -->
             @if (auth()->user()->role !== 'analyst')
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-md space-y-4">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-800 pb-2.5">Current Lead Status</h3>
+                    <form action="{{ route('crm.b2c.status', $lead->id) }}" method="POST" class="space-y-3">
+                        @csrf
+                        <select name="status" class="w-full bg-slate-950 border border-slate-800 focus:border-amra-primary rounded-xl px-4 py-3 outline-none text-xs text-slate-300">
+                            @foreach (['new' => 'New', 'shared' => 'Shared', 'contacted' => 'Contacted', 'follow_up' => 'Follow-up', 'site_visit_scheduled' => 'Site Visit Scheduled', 'interested' => 'Interested', 'closed_won' => 'Closed/Won', 'closed_lost' => 'Closed/Lost'] as $value => $label)
+                                <option value="{{ $value }}" {{ $lead->status === $value ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        <input type="text" name="notes" placeholder="Optional status update note..." class="w-full bg-slate-950 border border-slate-800 focus:border-amra-primary rounded-xl px-4 py-3 outline-none text-xs text-slate-200">
+                        <button class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-3 rounded-xl">Update Status</button>
+                    </form>
+                </div>
+
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-md space-y-4">
                     <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-800 pb-2.5">Admin Filter</h3>
                     <form action="{{ route('crm.b2c.filter', $lead->id) }}" method="POST" class="space-y-3">
@@ -206,8 +232,8 @@
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-md space-y-4">
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between border-b border-slate-800 pb-3">
                         <div>
-                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Distribute Lead to Partners</h3>
-                            <p class="text-[10px] text-slate-500 mt-1.5 leading-relaxed">Auto assign by partner package rules, or manually select certified partners to share this buyer's contact details and requirements.</p>
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Share Lead</h3>
+                            <p class="text-[10px] text-slate-500 mt-1.5 leading-relaxed">Share directly with Sales Team members, Builders, or Agents. Every delivery is recorded in the history.</p>
                         </div>
                         <form action="{{ route('crm.b2c.auto-distribute', $lead->id) }}" method="POST" class="shrink-0">
                             @csrf
@@ -220,6 +246,18 @@
 
                     <form action="{{ route('crm.b2c.share', $lead->id) }}" method="POST" class="space-y-4">
                         @csrf
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Sales Team</label>
+                            <div class="max-h-40 overflow-y-auto border border-slate-800 rounded-xl bg-slate-950 p-3 space-y-2">
+                                @foreach ($salesPeople as $person)
+                                    <label class="flex items-center gap-3 p-2 rounded-lg bg-slate-900/60 border border-slate-850 cursor-pointer">
+                                        <input type="checkbox" name="sales_person_ids[]" value="{{ $person->id }}" class="w-4 h-4 rounded border-slate-800 bg-slate-950 text-amra-primary">
+                                        <span class="text-xs font-bold text-slate-200">{{ $person->name }}</span>
+                                        <span class="ml-auto text-[9px] text-slate-500">{{ $person->location }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
                         
                         <!-- Partner Searchable Checkboxes -->
                         <div class="space-y-2">
@@ -237,8 +275,7 @@
                             <!-- List Box Container -->
                             <div class="max-h-60 overflow-y-auto border border-slate-800 rounded-xl bg-slate-950 p-3 space-y-2 pr-2">
                                 @php 
-                                    // Get already shared partner IDs
-                                    $sharedPartnerIds = $lead->shares()->pluck('partner_id')->toArray();
+                                    $sharedPartnerIds = [];
                                 @endphp
 
                                 @foreach ($partners as $partner)
@@ -246,7 +283,6 @@
                                     
                                     <label class="flex items-start gap-3 p-2 rounded-lg bg-slate-900/60 border border-slate-850 hover:border-slate-700 cursor-pointer select-none transition-colors partner-item" data-name="{{ strtolower($partner->company_name) }}" data-city="{{ strtolower($partner->city) }}">
                                         <input type="checkbox" name="partner_ids[]" value="{{ $partner->id }}" 
-                                            {{ $alreadyShared ? 'disabled checked' : '' }}
                                             class="w-4 h-4 rounded border-slate-800 bg-slate-950 text-amra-primary focus:ring-teal-500/20 mt-0.5">
                                         
                                         <div class="min-w-0">
@@ -260,9 +296,6 @@
                                                 <span>{{ $partner->type }}</span>
                                                 <span>•</span>
                                                 <span class="text-slate-400 capitalize">Package: {{ $partner->package }}</span>
-                                                @if ($alreadyShared)
-                                                    <span class="text-teal-400 block">• Shared</span>
-                                                @endif
                                             </div>
                                         </div>
                                     </label>
@@ -277,11 +310,70 @@
                         </div>
 
                         <button type="submit" class="w-full bg-amra-primary hover:bg-teal-400 text-slate-950 font-bold text-xs py-3.5 rounded-xl transition-all shadow-md shadow-teal-500/10">
-                            Distribute Leads to Selected Partners
+                            Share Lead with Selected Recipients
                         </button>
                     </form>
                 </div>
             @endif
+            <!-- Schedule B2C Follow-up -->
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-md space-y-4 text-left">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-800 pb-2.5">Schedule Follow-up</h3>
+                <form action="{{ route('crm.b2c.followup', $lead->id) }}" method="POST" class="space-y-3">
+                    @csrf
+                    <div>
+                        <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1">Due Date & Time</label>
+                        <input type="datetime-local" name="due_at" required
+                            class="w-full bg-slate-950 border border-slate-800 focus:border-amra-primary rounded-xl px-3 py-2 text-xs text-slate-200">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1">Follow-up Notes</label>
+                        <textarea name="notes" rows="2" placeholder="e.g. Call to discuss budget fit..." required
+                            class="w-full bg-slate-950 border border-slate-800 focus:border-amra-primary rounded-xl px-3 py-2 text-xs text-slate-200"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 rounded-xl transition-all shadow-sm">
+                        Schedule Reminder
+                    </button>
+                </form>
+            </div>
+
+            <!-- Pending Follow-ups list -->
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-md space-y-4">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-800 pb-2.5">Follow-up Tasks</h3>
+                <div class="space-y-3">
+                    @forelse ($lead->followUps as $fu)
+                        <div class="p-3 rounded-xl border {{ $fu->completed_at ? 'border-slate-800 bg-slate-950/20 text-slate-500' : 'border-rose-950/40 bg-rose-950/10 text-slate-300' }}">
+                            <div class="flex items-center justify-between text-[9px] font-bold uppercase tracking-wider mb-1.5">
+                                <span class="flex items-center gap-1">
+                                    <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                                    {{ $fu->due_at ? $fu->due_at->format('d M Y, h:i A') : 'No date' }}
+                                </span>
+                                @if($fu->completed_at)
+                                    <span class="text-emerald-400">✓ Completed</span>
+                                @else
+                                    <span class="text-rose-400">● Due Pending</span>
+                                @endif
+                            </div>
+                            <p class="text-xs leading-normal font-medium">"{{ $fu->notes }}"</p>
+                            @if(!$fu->completed_at)
+                                <form action="{{ route('crm.b2c.followup.complete', $fu->id) }}" method="POST" class="mt-2.5 flex gap-2">
+                                    @csrf
+                                    <input type="text" name="outcome" placeholder="Outcome (e.g. Call outcome)..." required
+                                        class="flex-1 bg-slate-950 border border-slate-800 focus:border-amra-primary rounded-lg px-2.5 py-1.5 text-[10px] text-slate-200">
+                                    <button type="submit" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 px-2.5 py-1.5 rounded-lg text-[10px] font-extrabold uppercase shrink-0">
+                                        Complete
+                                    </button>
+                                </form>
+                            @else
+                                <div class="mt-2 text-[10px] italic text-slate-500">
+                                    Outcome: {{ $fu->outcome ?? 'Done' }} (at {{ $fu->completed_at->format('d M, h:i A') }})
+                                </div>
+                            @endif
+                        </div>
+                    @empty
+                        <p class="text-xs text-slate-500 italic pl-2">No follow-up reminders scheduled for this lead.</p>
+                    @endforelse
+                </div>
+            </div>
 
             <!-- Chronological Timeline Logs -->
             <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-md space-y-4">

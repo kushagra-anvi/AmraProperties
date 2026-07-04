@@ -22,14 +22,14 @@ class ExampleTest extends TestCase
 
     public function test_public_site_blade_pages_render_successfully(): void
     {
-        foreach (['/', '/about', '/contact', '/property', '/privacy-policy', '/terms-conditions', '/rera-disclaimer', '/advertiser-agreement'] as $path) {
+        foreach (['/', '/about-us', '/contact', '/property', '/privacy-policy', '/terms-conditions', '/rera-disclaimer', '/4521-2'] as $path) {
             $this->get($path)->assertStatus(200);
         }
     }
 
     public function test_legacy_html_site_urls_redirect_to_blade_routes(): void
     {
-        $this->get('/pages/about.html')->assertRedirect('/about');
+        $this->get('/pages/about.html')->assertRedirect('/about-us');
         $this->get('/pages/contact.html')->assertRedirect('/contact');
         $this->get('/pages/property.html')->assertRedirect('/property');
         $this->get('/pages/privacy.html')->assertRedirect('/privacy-policy');
@@ -38,9 +38,10 @@ class ExampleTest extends TestCase
 
     public function test_legacy_privacy_terms_urls_redirect_to_new_paths(): void
     {
+        $this->get('/about')->assertRedirect('/about-us');
         $this->get('/privacy')->assertRedirect('/privacy-policy');
         $this->get('/terms')->assertRedirect('/terms-conditions');
-        $this->get('/4521-2')->assertRedirect('/advertiser-agreement');
+        $this->get('/advertiser-agreement')->assertRedirect('/4521-2');
     }
 
     /**
@@ -546,5 +547,205 @@ class ExampleTest extends TestCase
         });
 
         unlink($tempFile);
+    }
+
+    public function test_contact_form_submission_stores_null_phone_when_empty(): void
+    {
+        $response = $this->postJson('/contact', [
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john.doe@example.com',
+            'phone' => '', // Empty phone
+            'message' => 'Looking for a flat in Pune',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('b2_c_leads', [
+            'email' => 'john.doe@example.com',
+            'phone' => null, // Should be saved as null, not default dummy
+        ]);
+    }
+
+    public function test_property_lucknow_filter_explicitly_matches_lucknow_city(): void
+    {
+        // Create a Pune property
+        $puneProperty = \App\Models\Property::create([
+            'title' => 'Pune Green Valley',
+            'slug' => 'pune-green-valley',
+            'price' => 5000000,
+            'city' => 'Pune',
+            'status' => 'publish',
+        ]);
+
+        // Create a Lucknow property
+        $lucknowProperty = \App\Models\Property::create([
+            'title' => 'Lucknow Gomti Residency',
+            'slug' => 'lucknow-gomti-residency',
+            'price' => 4000000,
+            'city' => 'Lucknow',
+            'status' => 'publish',
+        ]);
+
+        $response = $this->get('/property?location=lucknow');
+        $response->assertStatus(200);
+        $response->assertSee('Lucknow Gomti Residency');
+        $response->assertDontSee('Pune Green Valley');
+    }
+
+    public function test_property_villa_filter_includes_bhk_configurations(): void
+    {
+        $villa = \App\Models\Property::create([
+            'title' => 'Luxury 3 BHK Villa',
+            'slug' => 'luxury-3-bhk-villa',
+            'price' => 9000000,
+            'city' => 'Lucknow',
+            'status' => 'publish',
+            'configuration' => '3 BHK Villa',
+        ]);
+
+        $response = $this->get('/property?type=villa');
+        $response->assertStatus(200);
+        $response->assertSee('Luxury 3 BHK Villa');
+    }
+
+    public function test_partner_csv_import_provisions_user_account_if_email_is_present(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $csvContent = "company_name,contact_person,phone,city,type,email,package,paid_amount\n";
+        $csvContent .= "Imported Agent Corp,Agent Contact,7777777777,Mumbai,agent,imported_agent@corp.com,growth,15000\n";
+
+        $tempFile = tempnam(sys_get_temp_dir(), 'test_partner_') . '.csv';
+        file_put_contents($tempFile, $csvContent);
+
+        $uploadedFile = new \Illuminate\Http\UploadedFile(
+            $tempFile,
+            'partners.csv',
+            'text/csv',
+            null,
+            true
+        );
+
+        $response = $this->actingAs($admin)->post('/crm/partners/bulk-import', [
+            'csv_file' => $uploadedFile,
+        ]);
+
+        $response->assertStatus(302);
+
+        // Verify partner was created
+        $this->assertDatabaseHas('partners', [
+            'company_name' => 'Imported Agent Corp',
+            'email' => 'imported_agent@corp.com',
+        ]);
+
+        // Verify corresponding user was provisioned
+        $this->assertDatabaseHas('users', [
+            'email' => 'imported_agent@corp.com',
+            'role' => 'partner',
+        ]);
+
+        unlink($tempFile);
+    }
+
+    public function test_super_admin_can_access_create_sales_rep_form(): void
+    {
+        $superAdmin = User::factory()->create(['role' => 'super_admin']);
+        $response = $this->actingAs($superAdmin)->get('/crm/sales/create');
+        $response->assertStatus(200);
+        $response->assertSee('Add Sales Representative');
+    }
+
+    public function test_super_admin_can_store_new_sales_representative(): void
+    {
+        $superAdmin = User::factory()->create(['role' => 'super_admin']);
+        $response = $this->actingAs($superAdmin)->post('/crm/sales', [
+            'name' => 'Tester Rep',
+            'email' => 'tester.rep@amra.com',
+            'password' => 'password123',
+            'phone' => '+91 88888 88888',
+            'location' => 'Pune Office',
+            'service_areas' => ['Koregaon Park', 'Kalyani Nagar'],
+        ]);
+
+        $response->assertRedirect('/crm/sales');
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'tester.rep@amra.com',
+            'role' => 'sales_team',
+        ]);
+
+        $this->assertDatabaseHas('sales_people', [
+            'name' => 'Tester Rep',
+            'phone' => '+91 88888 88888',
+            'location' => 'Pune Office',
+        ]);
+    }
+
+    public function test_super_admin_can_access_edit_sales_rep_form(): void
+    {
+        $superAdmin = User::factory()->create(['role' => 'super_admin']);
+        $salesPerson = \App\Models\SalesPerson::create([
+            'name' => 'Existing Rep',
+            'phone' => '1231231230',
+            'location' => 'Lucknow',
+            'is_active' => true,
+        ]);
+
+        $response = $this->actingAs($superAdmin)->get("/crm/sales/{$salesPerson->id}/edit");
+        $response->assertStatus(200);
+        $response->assertSee('Edit Sales Representative');
+    }
+
+    public function test_super_admin_can_update_sales_representative(): void
+    {
+        $superAdmin = User::factory()->create(['role' => 'super_admin']);
+        
+        $user = User::factory()->create([
+            'name' => 'Rep Old Name',
+            'email' => 'rep.old@amra.com',
+            'role' => 'sales_team',
+        ]);
+        
+        $salesPerson = \App\Models\SalesPerson::create([
+            'user_id' => $user->id,
+            'name' => 'Rep Old Name',
+            'phone' => '1231231230',
+            'location' => 'Lucknow',
+            'is_active' => true,
+        ]);
+
+        $response = $this->actingAs($superAdmin)->put("/crm/sales/{$salesPerson->id}", [
+            'name' => 'Rep New Name',
+            'email' => 'rep.new@amra.com',
+            'phone' => '9999999999',
+            'location' => 'Mumbai',
+            'service_areas' => ['Powai'],
+            'is_active' => 0, // deactivate
+        ]);
+
+        $response->assertRedirect("/crm/sales/{$salesPerson->id}");
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'name' => 'Rep New Name',
+            'email' => 'rep.new@amra.com',
+            'is_active' => false,
+        ]);
+
+        $this->assertDatabaseHas('sales_people', [
+            'id' => $salesPerson->id,
+            'name' => 'Rep New Name',
+            'phone' => '9999999999',
+            'is_active' => false,
+        ]);
+    }
+
+    public function test_non_super_admin_cannot_access_sales_rep_creation_endpoints(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $this->actingAs($admin)->get('/crm/sales/create')->assertStatus(403);
+        $this->actingAs($admin)->post('/crm/sales', [])->assertStatus(403);
     }
 }

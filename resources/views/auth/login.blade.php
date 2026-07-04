@@ -28,6 +28,7 @@
             }
         }
     </script>
+    @vite('resources/js/app.js')
 
     <style>
         html,

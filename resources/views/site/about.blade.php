@@ -9,20 +9,20 @@
         <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-teal-500/5 via-slate-50/0 to-slate-50/0 pointer-events-none"></div>
 
         <!-- Hero Section -->
-        <section class="max-w-7xl mx-auto px-6 pt-16 pb-12 text-center relative z-10">
-            <span class="inline-flex items-center gap-1.5 bg-teal-500/10 text-teal-700 text-xs font-bold px-4 py-2 rounded-full uppercase tracking-wider mb-6">
+        <section class="max-w-7xl mx-auto px-4 md:px-6 pt-8 pb-6 sm:pt-16 sm:pb-12 text-center relative z-10">
+            <span class="inline-flex items-center gap-1.5 bg-teal-500/10 text-teal-700 text-xs font-bold px-4 py-2 rounded-full uppercase tracking-wider mb-4 sm:mb-6">
                 <i data-lucide="sparkles" class="w-3.5 h-3.5" aria-hidden="true"></i> Our Story
             </span>
-            <h1 class="text-4xl md:text-6xl font-serif font-extrabold text-amra-dark mb-6 leading-tight">
+            <h1 class="text-2xl sm:text-4xl md:text-6xl font-serif font-extrabold text-amra-dark mb-4 sm:mb-6 leading-tight">
                 Redefining Luxury <br>Real Estate <span class="text-amra-primary italic font-light">With Integrity</span>
             </h1>
-            <p class="text-base md:text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed">
+            <p class="text-sm sm:text-base md:text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed">
                 At Amra Property, we believe luxury is more than an aesthetic—it's an end-to-end experience defined by transparency, trust, and flawless curation.
             </p>
         </section>
 
         <!-- Stats Grid Block -->
-        <section class="max-w-7xl mx-auto px-6 py-8 relative z-10">
+        <section class="max-w-7xl mx-auto px-4 md:px-6 py-8 relative z-10">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Stat 1 -->
                 <div class="bg-white/80 backdrop-blur-md p-8 rounded-3xl border border-slate-100 hover:border-teal-500/20 shadow-sm hover:shadow-md transition-all duration-300 text-center group">
@@ -46,13 +46,13 @@
         </section>
 
         <!-- Brand Narration Grid -->
-        <section class="max-w-7xl mx-auto px-6 py-12 relative z-10">
-            <div class="bg-white border border-slate-100 rounded-3xl p-8 md:p-12 shadow-sm flex flex-col lg:flex-row gap-12 items-center">
+        <section class="max-w-7xl mx-auto px-4 md:px-6 py-6 sm:py-12 relative z-10">
+            <div class="bg-white border border-slate-100 rounded-3xl p-5 sm:p-8 md:p-12 shadow-sm flex flex-col lg:flex-row gap-12 items-center">
                 <div class="flex-1 space-y-6">
                     <div class="w-12 h-12 rounded-2xl bg-teal-500/10 flex items-center justify-center text-teal-600">
                         <i data-lucide="target" class="w-6 h-6" aria-hidden="true"></i>
                     </div>
-                    <h2 class="text-3xl font-serif font-bold text-amra-dark">Our Clear Mission</h2>
+                    <h2 class="text-2xl sm:text-3xl font-serif font-bold text-amra-dark">Our Clear Mission</h2>
                     <p class="text-slate-500 leading-relaxed text-sm">
                         Amra Property is established on a single core principle: to dissolve the friction, opacity, and stress of high-value real estate acquisitions. Whether matching prospective owners with elite Powai flats or exquisite villas in Lucknow, we prioritize genuine representation above all else.
                     </p>
@@ -69,15 +69,15 @@
         </section>
 
         <!-- Bento Styled 'Why Choose Us' Cards Grid -->
-        <section class="max-w-7xl mx-auto px-6 py-12 relative z-10">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-serif font-bold text-amra-dark">Why Choose <span class="text-amra-primary">Amra Property?</span></h2>
-                <p class="text-slate-500 text-sm mt-2">Setting the baseline standard for luxury property advising.</p>
+        <section class="max-w-7xl mx-auto px-4 md:px-6 py-6 sm:py-12 relative z-10">
+            <div class="text-center mb-8 sm:mb-12">
+                <h2 class="text-2xl sm:text-3xl font-serif font-bold text-amra-dark">Why Choose <span class="text-amra-primary">Amra Property?</span></h2>
+                <p class="text-slate-500 text-xs sm:text-sm mt-2">Setting the baseline standard for luxury property advising.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Bento Card 1 -->
-                <div class="bg-white border border-slate-100 p-8 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-teal-500/20 transition-all duration-300 flex flex-col justify-between group">
+                <div class="bg-white border border-slate-100 p-5 sm:p-8 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-teal-500/20 transition-all duration-300 flex flex-col justify-between group">
                     <div class="mb-6">
                         <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mb-6 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
                             <i data-lucide="shield-check" class="w-6 h-6" aria-hidden="true"></i>
@@ -93,7 +93,7 @@
                 </div>
 
                 <!-- Bento Card 2 -->
-                <div class="bg-white border border-slate-100 p-8 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-teal-500/20 transition-all duration-300 flex flex-col justify-between group">
+                <div class="bg-white border border-slate-100 p-5 sm:p-8 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-teal-500/20 transition-all duration-300 flex flex-col justify-between group">
                     <div class="mb-6">
                         <div class="w-12 h-12 rounded-2xl bg-teal-500/10 text-teal-600 flex items-center justify-center mb-6 group-hover:bg-teal-500 group-hover:text-white transition-all duration-300">
                             <i data-lucide="gem" class="w-6 h-6" aria-hidden="true"></i>
@@ -109,7 +109,7 @@
                 </div>
 
                 <!-- Bento Card 3 -->
-                <div class="bg-white border border-slate-100 p-8 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-teal-500/20 transition-all duration-300 flex flex-col justify-between group">
+                <div class="bg-white border border-slate-100 p-5 sm:p-8 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-teal-500/20 transition-all duration-300 flex flex-col justify-between group">
                     <div class="mb-6">
                         <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mb-6 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
                             <i data-lucide="handshake" class="w-6 h-6" aria-hidden="true"></i>
