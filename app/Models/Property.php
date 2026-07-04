@@ -135,6 +135,32 @@ class Property extends Model
         return '₹' . number_format($price) . '/sq.ft';
     }
 
+    public function getShortAddressAttribute(): string
+    {
+        if (empty($this->address)) {
+            return $this->city ? ucwords(strtolower($this->city)) : 'Mumbai';
+        }
+
+        $parts = array_map('trim', explode(',', $this->address));
+        $cleanParts = [];
+        
+        foreach ($parts as $part) {
+            $lower = strtolower($part);
+            if ($lower === 'india' || $lower === 'maharashtra' || preg_match('/^\d{6}$/', $lower) || preg_match('/maharashtra\s+\d{6}/', $lower)) {
+                continue;
+            }
+            if (!empty($part)) {
+                $cleanParts[] = ucwords(strtolower($part));
+            }
+        }
+
+        if (count($cleanParts) >= 2) {
+            return $cleanParts[count($cleanParts) - 2] . ', ' . $cleanParts[count($cleanParts) - 1];
+        }
+
+        return !empty($cleanParts) ? implode(', ', $cleanParts) : ucwords(strtolower($this->city));
+    }
+
     public function getFormattedPossessionAttribute(): ?string
     {
         if ($this->possession_date) {

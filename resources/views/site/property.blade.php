@@ -114,7 +114,7 @@
                             <div>
                                 <p class="text-slate-400 text-[11px] font-medium tracking-wide flex items-center gap-1 mb-2">
                                     <i data-lucide="map-pin" class="w-3.5 h-3.5 text-teal-500 shrink-0"></i> 
-                                    {{ Str::limit(ucwords(strtolower($property->address ?: ($property->city . ($property->state ? ', ' . $property->state : '')))), 35) }}
+                                    {{ $property->short_address }}
                                 </p>
                                 <h3 class="text-base font-serif font-bold text-slate-800 mb-2 group-hover:text-teal-600 transition-colors duration-300 leading-snug line-clamp-2 h-11">
                                     <a href="{{ route('site.property.show', $property->slug) }}">{{ html_entity_decode($property->title) }}</a>

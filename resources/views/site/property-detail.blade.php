@@ -118,10 +118,10 @@
 
                 @if(count($images) > 1)
                     <!-- Slider Actions -->
-                    <button id="prev-slide" class="absolute left-6 top-1/2 -translate-y-1/2 w-11 h-11 bg-white/80 hover:bg-white text-slate-800 rounded-full flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all opacity-0 group-hover:opacity-100 duration-300">
+                    <button id="prev-slide" class="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 bg-white/85 hover:bg-white text-slate-800 rounded-full flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all opacity-100 lg:opacity-0 lg:group-hover:opacity-100 duration-300 z-20">
                         <i data-lucide="chevron-left" class="w-5 h-5"></i>
                     </button>
-                    <button id="next-slide" class="absolute right-6 top-1/2 -translate-y-1/2 w-11 h-11 bg-white/80 hover:bg-white text-slate-800 rounded-full flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all opacity-0 group-hover:opacity-100 duration-300">
+                    <button id="next-slide" class="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 bg-white/85 hover:bg-white text-slate-800 rounded-full flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all opacity-100 lg:opacity-0 lg:group-hover:opacity-100 duration-300 z-20">
                         <i data-lucide="chevron-right" class="w-5 h-5"></i>
                     </button>
                     <!-- Index Overlay -->
@@ -157,13 +157,13 @@
                     
                     <!-- Section 1: Overview Specs -->
                     <div class="p-5 sm:p-8">
-                        <p class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                            <i data-lucide="map-pin" class="w-4 h-4 text-teal-500"></i>
-                            {{ $property->address ?: ($property->city . ($property->state ? ', ' . $property->state : '')) }}
-                        </p>
-                        <h1 class="text-xl sm:text-2xl md:text-3xl font-serif font-extrabold text-slate-800 leading-tight mb-4">
+                        <h1 class="text-xl sm:text-2xl md:text-3xl font-serif font-extrabold text-slate-800 leading-tight mb-2">
                             {{ html_entity_decode($property->title) }}
                         </h1>
+                        <p class="text-slate-500 text-xs sm:text-sm font-semibold mb-4 flex items-start gap-1.5">
+                            <i data-lucide="map-pin" class="w-4 h-4 text-teal-500 shrink-0 mt-0.5"></i>
+                            <span class="leading-relaxed">{{ $property->short_address }}</span>
+                        </p>
                         <div class="h-px bg-slate-100 w-full mb-4"></div>
                         <div class="flex items-center justify-between">
                             <div>
@@ -250,8 +250,8 @@
                             <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
                                 <i data-lucide="layout" class="w-4 h-4 text-teal-500"></i> Available Configurations & Pricing
                             </h3>
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full text-sm divide-y divide-slate-100">
+                            <div class="overflow-x-auto scrollbar-thin">
+                                <table class="min-w-full text-sm divide-y divide-slate-100 whitespace-nowrap">
                                     <thead>
                                         <tr class="text-left font-bold text-slate-400 text-xs uppercase tracking-wider">
                                             <th class="py-3 px-4">Layout Name</th>
@@ -343,24 +343,34 @@
                     @endif
 
                     <!-- Section 6: Map Location -->
-                    @if($property->latitude && $property->longitude)
+                    @if($property->address || ($property->latitude && $property->longitude))
                         <div class="p-5 sm:p-8">
-                            <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <h3 class="text-base font-bold text-slate-800 mb-2 flex items-center gap-2">
                                 <i data-lucide="map" class="w-4 h-4 text-teal-500"></i> Geographical Location
                             </h3>
-                            @if(config('services.google_maps.key'))
-                                <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.key') }}"></script>
-                                <div id="property-map" class="h-80 w-full rounded-2xl border border-slate-100 overflow-hidden relative z-10"></div>
-                            @else
-                                <div class="h-80 w-full rounded-2xl border border-slate-100 overflow-hidden relative z-10">
-                                    <iframe
-                                        width="100%"
-                                        height="100%"
-                                        frameborder="0" style="border:0"
-                                        src="https://maps.google.com/maps?q={{ $property->latitude }},{{ $property->longitude }}&hl=en&z=14&output=embed"
-                                        allowfullscreen>
-                                    </iframe>
-                                </div>
+                            
+                            @if($property->address)
+                                <p class="text-xs text-slate-500 font-semibold mb-4 leading-relaxed flex items-start gap-1.5 bg-slate-50 border border-slate-100/80 rounded-2xl p-3.5">
+                                    <i data-lucide="map-pin" class="w-4 h-4 text-slate-400 shrink-0 mt-0.5"></i>
+                                    <span>{{ $property->address }}</span>
+                                </p>
+                            @endif
+
+                            @if($property->latitude && $property->longitude)
+                                @if(config('services.google_maps.key'))
+                                    <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.key') }}"></script>
+                                    <div id="property-map" class="h-80 w-full rounded-2xl border border-slate-100 overflow-hidden relative z-10"></div>
+                                @else
+                                    <div class="h-80 w-full rounded-2xl border border-slate-100 overflow-hidden relative z-10">
+                                        <iframe
+                                            width="100%"
+                                            height="100%"
+                                            frameborder="0" style="border:0"
+                                            src="https://maps.google.com/maps?q={{ $property->latitude }},{{ $property->longitude }}&hl=en&z=14&output=embed"
+                                            allowfullscreen>
+                                        </iframe>
+                                    </div>
+                                @endif
                             @endif
                         </div>
                     @endif
@@ -774,6 +784,77 @@
                 currentIndex = (currentIndex < slidesCount - 1) ? currentIndex + 1 : 0;
                 updateSlider();
             });
+        }
+
+        // Touch / Swipe and Mouse Drag support
+        let isDragging = false;
+        let startX = 0;
+
+        container.addEventListener('touchstart', touchStart, { passive: true });
+        container.addEventListener('touchmove', touchMove, { passive: true });
+        container.addEventListener('touchend', touchEnd);
+
+        container.addEventListener('mousedown', dragStart);
+        container.addEventListener('mousemove', dragMove);
+        container.addEventListener('mouseup', dragEnd);
+        container.addEventListener('mouseleave', dragEnd);
+
+        container.querySelectorAll('img').forEach(img => {
+            img.addEventListener('dragstart', (e) => e.preventDefault());
+        });
+
+        function dragStart(e) {
+            isDragging = true;
+            startX = e.pageX;
+            container.style.transition = 'none';
+        }
+
+        function dragMove(e) {
+            if (!isDragging) return;
+            const diffX = e.pageX - startX;
+            const parentWidth = container.parentElement.offsetWidth || 1;
+            const percentOffset = (currentIndex * -100) + (diffX / parentWidth * 100);
+            container.style.transform = `translateX(${percentOffset / slidesCount}%)`;
+        }
+
+        function dragEnd(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            container.style.transition = 'transform 0.5s ease-in-out';
+            const diffX = e.pageX - startX;
+            if (diffX < -60) {
+                currentIndex = (currentIndex < slidesCount - 1) ? currentIndex + 1 : currentIndex;
+            } else if (diffX > 60) {
+                currentIndex = (currentIndex > 0) ? currentIndex - 1 : currentIndex;
+            }
+            updateSlider();
+        }
+
+        function touchStart(e) {
+            isDragging = true;
+            startX = e.touches[0].clientX;
+            container.style.transition = 'none';
+        }
+
+        function touchMove(e) {
+            if (!isDragging) return;
+            const diffX = e.touches[0].clientX - startX;
+            const parentWidth = container.parentElement.offsetWidth || 1;
+            const percentOffset = (currentIndex * -100) + (diffX / parentWidth * 100);
+            container.style.transform = `translateX(${percentOffset / slidesCount}%)`;
+        }
+
+        function touchEnd(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            container.style.transition = 'transform 0.5s ease-in-out';
+            const diffX = e.changedTouches[0].clientX - startX;
+            if (diffX < -50) {
+                currentIndex = (currentIndex < slidesCount - 1) ? currentIndex + 1 : currentIndex;
+            } else if (diffX > 50) {
+                currentIndex = (currentIndex > 0) ? currentIndex - 1 : currentIndex;
+            }
+            updateSlider();
         }
     });
 </script>
