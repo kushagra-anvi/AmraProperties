@@ -5,8 +5,10 @@ namespace App\Http\Controllers\CRM;
 use App\Http\Controllers\Controller;
 use App\Models\Partner;
 use App\Models\Property;
+use App\Models\PropertyTag;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -24,7 +26,11 @@ class PropertyAdminController extends Controller
                 $q->where('title', 'like', "%{$search}%")
                   ->orWhere('developer_name', 'like', "%{$search}%")
                   ->orWhere('city', 'like', "%{$search}%")
-                  ->orWhere('configuration', 'like', "%{$search}%");
+                  ->orWhere('configuration', 'like', "%{$search}%")
+                  ->orWhereHas('tags', function ($tagQuery) use ($search) {
+                      $tagQuery->where('name', 'like', "%{$search}%")
+                          ->orWhere('slug', 'like', '%' . Str::slug($search) . '%');
+                  });
             });
         }
 
@@ -38,7 +44,8 @@ class PropertyAdminController extends Controller
     public function create(): View
     {
         $partners = Partner::where('is_active', true)->orderBy('company_name')->get();
-        return view('crm.properties.create', compact('partners'));
+        $tags = PropertyTag::where('is_active', true)->orderBy('name')->get();
+        return view('crm.properties.create', compact('partners', 'tags'));
     }
 
     /**
@@ -52,7 +59,7 @@ class PropertyAdminController extends Controller
             'price' => 'nullable|integer|min:0',
             'avg_price_per_sqft' => 'nullable|numeric|min:0',
             'possession_date' => 'nullable|date',
-            'possession_status' => 'nullable|string|max:255',
+            'possession_status' => ['nullable', Rule::in(['Ready to Move', 'Under Construction'])],
             'bedrooms' => 'nullable|integer|min:0',
             'bathrooms' => 'nullable|integer|min:0',
             'area' => 'nullable|integer|min:0',
@@ -80,6 +87,9 @@ class PropertyAdminController extends Controller
             'amenities' => 'nullable|array',
             'partners' => 'nullable|array',
             'partners.*' => 'exists:partners,id',
+            'tag_ids' => 'nullable|array',
+            'tag_ids.*' => 'exists:property_tags,id',
+            'custom_tags' => 'nullable|string|max:1000',
             'configurations' => 'nullable|array',
             'configurations.*.name' => 'required|string|max:255',
             'configurations.*.price' => 'nullable|integer|min:0',
@@ -128,6 +138,8 @@ class PropertyAdminController extends Controller
             $property->partners()->sync($request->input('partners'));
         }
 
+        $property->tags()->sync($this->resolveTagIds($request));
+
         if ($request->has('configurations')) {
             foreach ($request->input('configurations') as $config) {
                 if (!empty($config['name'])) {
@@ -145,7 +157,9 @@ class PropertyAdminController extends Controller
     public function edit(Property $property): View
     {
         $partners = Partner::where('is_active', true)->orderBy('company_name')->get();
-        return view('crm.properties.edit', compact('property', 'partners'));
+        $tags = PropertyTag::where('is_active', true)->orderBy('name')->get();
+        $property->load('tags');
+        return view('crm.properties.edit', compact('property', 'partners', 'tags'));
     }
 
     /**
@@ -159,7 +173,7 @@ class PropertyAdminController extends Controller
             'price' => 'nullable|integer|min:0',
             'avg_price_per_sqft' => 'nullable|numeric|min:0',
             'possession_date' => 'nullable|date',
-            'possession_status' => 'nullable|string|max:255',
+            'possession_status' => ['nullable', Rule::in(['Ready to Move', 'Under Construction'])],
             'bedrooms' => 'nullable|integer|min:0',
             'bathrooms' => 'nullable|integer|min:0',
             'area' => 'nullable|integer|min:0',
@@ -187,6 +201,9 @@ class PropertyAdminController extends Controller
             'amenities' => 'nullable|array',
             'partners' => 'nullable|array',
             'partners.*' => 'exists:partners,id',
+            'tag_ids' => 'nullable|array',
+            'tag_ids.*' => 'exists:property_tags,id',
+            'custom_tags' => 'nullable|string|max:1000',
             'configurations' => 'nullable|array',
             'configurations.*.name' => 'required|string|max:255',
             'configurations.*.price' => 'nullable|integer|min:0',
@@ -233,6 +250,7 @@ class PropertyAdminController extends Controller
         $property->update($validated);
 
         $property->partners()->sync($request->input('partners', []));
+        $property->tags()->sync($this->resolveTagIds($request));
 
         $property->configurations()->delete();
         if ($request->has('configurations')) {
@@ -260,6 +278,42 @@ class PropertyAdminController extends Controller
         return collect(preg_split('/\r\n|\r|\n/', $value ?? ''))
             ->map(fn ($line) => trim($line))
             ->filter()
+            ->values()
+            ->all();
+    }
+
+    private function resolveTagIds(Request $request): array
+    {
+        $selectedTagIds = collect($request->input('tag_ids', []))
+            ->map(fn ($id) => (int) $id)
+            ->filter()
+            ->all();
+
+        $customTagIds = collect(preg_split('/,|\r\n|\r|\n/', $request->input('custom_tags', '')))
+            ->map(fn ($tag) => trim($tag))
+            ->filter()
+            ->unique(fn ($tag) => Str::lower($tag))
+            ->map(function (string $tagName) {
+                $slug = Str::slug($tagName);
+
+                if ($slug === '') {
+                    return null;
+                }
+
+                return PropertyTag::firstOrCreate(
+                    ['slug' => $slug],
+                    [
+                        'name' => Str::of($tagName)->squish()->title(),
+                        'is_active' => true,
+                    ]
+                )->id;
+            })
+            ->filter()
+            ->all();
+
+        return collect($selectedTagIds)
+            ->merge($customTagIds)
+            ->unique()
             ->values()
             ->all();
     }

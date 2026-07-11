@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('property_enquiries', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('property_id')->constrained('properties')->cascadeOnDelete();
+            $table->foreignId('property_id')->nullable()->constrained('properties')->cascadeOnDelete();
             $table->foreignId('partner_id')->nullable()->constrained('partners')->nullOnDelete();
             $table->foreignId('seller_partner_id')->nullable()->constrained('partners')->nullOnDelete();
             $table->foreignId('assigned_sales_person_id')->nullable()->constrained('sales_people')->nullOnDelete();

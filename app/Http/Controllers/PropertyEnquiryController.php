@@ -134,6 +134,22 @@ class PropertyEnquiryController extends Controller
             'intent' => ['nullable', 'string', 'max:80'],
         ]);
 
+        $sellerName = $partner->company_name ?: $partner->contact_person ?: 'Partner #' . $partner->id;
+
+        $enquiry = PropertyEnquiry::create([
+            'property_id' => null,
+            'partner_id' => $partner->id,
+            'seller_partner_id' => $partner->id,
+            'assigned_sales_person_id' => $partner->assigned_sales_person_id,
+            'name' => $validated['name'],
+            'phone' => $validated['phone'],
+            'email' => $validated['email'] ?? null,
+            'message' => $validated['message'] ?? 'Recommended seller contact request for ' . $sellerName,
+            'source' => 'recommended_seller_contact',
+            'intent' => $validated['intent'] ?? 'seller_contact',
+            'revealed_at' => now(),
+        ]);
+
         $lead = B2CLead::create([
             'source_platform' => 'website',
             'lead_created_at' => now(),
@@ -145,16 +161,25 @@ class PropertyEnquiryController extends Controller
             'property_type' => 'property',
             'configuration' => 'seller_contact',
             'status' => 'new',
-            'remark' => 'Recommended seller contact request for ' . ($partner->company_name ?: $partner->contact_person ?: 'Partner #' . $partner->id) . '. ' . ($validated['message'] ?? ''),
+            'remark' => 'Recommended seller contact request for ' . $sellerName . '. Enquiry #' . $enquiry->id . '. ' . ($validated['message'] ?? ''),
         ]);
+
+        \App\Models\B2CLeadShare::create([
+            'b2_c_lead_id' => $lead->id,
+            'partner_id' => $partner->id,
+            'shared_by_user_id' => null,
+            'shared_at' => now(),
+            'remark' => 'Auto-assigned via recommended seller contact request.',
+        ]);
+        $lead->update(['status' => 'shared']);
 
         LeadStatusLog::create([
             'lead_type' => B2CLead::class,
             'lead_id' => $lead->id,
             'from_status' => null,
-            'to_status' => 'new',
+            'to_status' => 'shared',
             'changed_by_user_id' => Auth::id(),
-            'notes' => 'Homepage recommended seller contact captured.',
+            'notes' => 'Recommended seller contact captured as property enquiry #' . $enquiry->id . '.',
         ]);
 
         $phone = $partner->phone ?: config('crm.default_contact_phone', '+919559992958');
@@ -162,6 +187,7 @@ class PropertyEnquiryController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Enquiry saved. Seller contact unlocked.',
+            'enquiry_id' => $enquiry->id,
             'lead_id' => $lead->id,
             'phone' => $phone,
             'whatsapp_url' => 'https://wa.me/' . preg_replace('/\D+/', '', $phone) . '?text=' . rawurlencode('Hi, I found you on Amra Property and want to discuss properties.'),

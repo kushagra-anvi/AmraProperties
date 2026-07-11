@@ -1,7 +1,7 @@
 @extends('layouts.site')
 
-@section('title', 'Amra Property - Real Estate in Lucknow & Mumbai')
-@section('meta_description', 'Buy property for sale in Lucknow & Mumbai with Amra Property. Book Flats, Villas, Row Houses or any type of property at the best price with easy EMI.')
+@section('title', 'Amra Property - Real Estate Across Top Cities')
+@section('meta_description', 'Buy and rent verified properties across Mumbai, Thane, Navi Mumbai, Panvel, Lucknow, Jaipur, Dubai and more with Amra Property.')
 
 @section('seo_schema')
 <script type="application/ld+json">
@@ -46,14 +46,14 @@
       "@@type": "WebPage",
       "@@id": "https://www.amraproperty.com/#webpage",
       "url": "https://www.amraproperty.com/",
-      "name": "Amra Property - Real Estate in Lucknow & Mumbai",
+      "name": "Amra Property - Real Estate Across Top Cities",
       "about": {
         "@@id": "https://www.amraproperty.com/#organization"
       },
       "isPartOf": {
         "@@id": "https://www.amraproperty.com/#website"
       },
-      "description": "Buy property for sale in Lucknow & Mumbai with Amra Property. Book Flats, Villas, Row Houses or any type of property at the best price with easy EMI."
+      "description": "Buy and rent verified properties across Mumbai, Thane, Navi Mumbai, Panvel, Lucknow, Jaipur, Dubai and more with Amra Property."
     }
   ]
 }
@@ -74,13 +74,13 @@
                     Find Your Dream <br><span class="text-teal-300">Property</span> Today
                 </h1>
                 <p class="text-xs sm:text-base md:text-lg text-white mb-5 sm:mb-10 max-w-2xl leading-relaxed font-semibold drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)]">
-                    Premium Flats, Villas, and Plots in Lucknow & Mumbai. No fake listings, just genuine homes.
+                    Verified flats, villas, plots, and commercial properties across Mumbai Metropolitan Region, Lucknow, Jaipur, Dubai, and more.
                 </p>
 
                 <!-- Rent/Sale Toggle Tabs -->
                 <div class="flex gap-1.5 mb-[-1px] z-10 relative self-start">
                     <button type="button" id="toggle-all" class="px-4 py-2 sm:px-5 sm:py-2.5 rounded-t-xl font-extrabold text-xs sm:text-sm transition-all bg-white text-teal-600 border-t border-x border-gray-200 relative z-20" onclick="setListingType('')">Any Purpose</button>
-                    <button type="button" id="toggle-sale" class="px-4 py-2 sm:px-5 sm:py-2.5 rounded-t-xl font-extrabold text-xs sm:text-sm transition-all bg-white text-slate-400 hover:text-teal-600 border-t border-x border-b border-gray-200/80 shadow-[inset_0_-2px_3px_rgba(0,0,0,0.03)] relative z-10" onclick="setListingType('sale')">For Sale</button>
+                    <button type="button" id="toggle-sale" class="px-4 py-2 sm:px-5 sm:py-2.5 rounded-t-xl font-extrabold text-xs sm:text-sm transition-all bg-white text-slate-400 hover:text-teal-600 border-t border-x border-b border-gray-200/80 shadow-[inset_0_-2px_3px_rgba(0,0,0,0.03)] relative z-10" onclick="setListingType('sale')">Buy</button>
                     <button type="button" id="toggle-rent" class="px-4 py-2 sm:px-5 sm:py-2.5 rounded-t-xl font-extrabold text-xs sm:text-sm transition-all bg-white text-slate-400 hover:text-teal-600 border-t border-x border-b border-gray-200/80 shadow-[inset_0_-2px_3px_rgba(0,0,0,0.03)] relative z-10" onclick="setListingType('rent')">For Rent</button>
                     <input type="hidden" id="home-listing-type" value="">
                 </div>
@@ -100,7 +100,10 @@
                     <!-- Row 2: Select Dropdowns & Search Button -->
                     <div class="grid grid-cols-1 md:grid-cols-5 gap-3 md:gap-4 items-end">
                         <div class="w-full">
-                            <label class="block text-xs sm:text-sm text-gray-400 sm:text-gray-500 font-semibold mb-1 sm:mb-2 pl-1 sm:pl-2">Location</label>
+                            <label class="flex items-center justify-between gap-2 text-xs sm:text-sm text-gray-400 sm:text-gray-500 font-semibold mb-1 sm:mb-2 pl-1 sm:pl-2">
+                                <span>Location</span>
+                                <span id="home-location-status" class="hidden text-[10px] font-bold text-teal-600"></span>
+                            </label>
                             <select id="home-location"
                                 class="w-full bg-slate-50 border border-gray-200 text-gray-800 font-medium rounded-lg px-4 py-3 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 transition-all cursor-pointer text-sm h-[48px]">
                                 <option value="">All Locations</option>
@@ -120,7 +123,7 @@
                                 <option value="commercial">Commercial / Office</option>
                             </select>
                         </div>
-                        <div class="w-full md:col-span-2">
+                        <div id="home-budget-range" class="w-full md:col-span-2">
                             <label class="block text-xs sm:text-sm text-gray-400 sm:text-gray-500 font-semibold mb-1 sm:mb-2 pl-1 sm:pl-2 flex justify-between">
                                 <span>Budget Range</span>
                                 <span id="home-budget-display" class="text-teal-600 font-extrabold text-xs">₹0 - ₹10 Cr+</span>
@@ -137,7 +140,7 @@
                         </div>
                         <button id="home-search-btn"
                             class="w-full bg-teal-500 text-white px-8 py-3 rounded-lg font-bold hover:bg-teal-600 transition-all shadow-md hover:-translate-y-0.5 flex items-center justify-center gap-2 h-[48px]">
-                            <i data-lucide="search" class="w-4 h-4"></i> Search
+                            <i data-lucide="search" class="w-5 h-5 shrink-0"></i> Search
                         </button>
                     </div>
                 </div>
@@ -227,7 +230,7 @@
                     </div>
                     <div>
                         <h4 class="text-sm font-serif font-bold text-amra-dark mb-0.5">Godrej Properties</h4>
-                        <p class="text-[10px] font-semibold text-teal-600 uppercase tracking-wider mb-2">Mumbai & Lucknow</p>
+                        <p class="text-[10px] font-semibold text-teal-600 uppercase tracking-wider mb-2">Pan-India Portfolio</p>
                     </div>
                     <div class="w-full pt-2 border-t border-gray-100 flex items-center justify-between text-[10px]">
                         <span class="font-medium text-slate-400">RERA Approved</span>
@@ -333,7 +336,7 @@
                     </div>
                     <div>
                         <h4 class="text-sm font-serif font-bold text-amra-dark mb-0.5">Godrej Properties</h4>
-                        <p class="text-[10px] font-semibold text-teal-600 uppercase tracking-wider mb-2">Mumbai & Lucknow</p>
+                        <p class="text-[10px] font-semibold text-teal-600 uppercase tracking-wider mb-2">Pan-India Portfolio</p>
                     </div>
                     <div class="w-full pt-2 border-t border-gray-100 flex items-center justify-between text-[10px]">
                         <span class="font-medium text-slate-400">RERA Approved</span>
@@ -469,12 +472,22 @@
                                         <p class="text-[9px] font-semibold text-slate-400 tracking-wide uppercase">Total Price</p>
                                     </div>
                                     <div class="flex gap-1.5">
-                                        <a href="https://wa.me/919559992958?text=Hi,%20I%20am%20interested%20in%20{{ rawurlencode(html_entity_decode($property->title)) }}" target="_blank" class="w-9 h-9 rounded-xl bg-emerald-50 hover:bg-emerald-500 text-emerald-600 hover:text-white flex items-center justify-center transition-all duration-300 shadow-sm active:scale-90 border border-emerald-100/50" title="Contact via WhatsApp">
+                                        <button type="button"
+                                            class="home-property-contact-trigger w-9 h-9 rounded-xl bg-emerald-50 hover:bg-emerald-500 text-emerald-600 hover:text-white flex items-center justify-center transition-all duration-300 shadow-sm active:scale-90 border border-emerald-100/50"
+                                            title="Contact via WhatsApp"
+                                            data-action="whatsapp"
+                                            data-property-title="{{ e(html_entity_decode($property->title)) }}"
+                                            data-endpoint="{{ route('site.property.enquiry', $property) }}">
                                             <svg class="w-4 h-4 fill-current" viewBox="0 0 16 16"><path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/></svg>
-                                        </a>
-                                        <a href="tel:+919559992958" class="w-9 h-9 rounded-xl bg-teal-50 hover:bg-teal-500 text-teal-600 hover:text-white flex items-center justify-center transition-all duration-300 shadow-sm active:scale-90 border border-teal-100/50" title="Contact via Phone">
+                                        </button>
+                                        <button type="button"
+                                            class="home-property-contact-trigger w-9 h-9 rounded-xl bg-teal-50 hover:bg-teal-500 text-teal-600 hover:text-white flex items-center justify-center transition-all duration-300 shadow-sm active:scale-90 border border-teal-100/50"
+                                            title="Contact via Phone"
+                                            data-action="phone"
+                                            data-property-title="{{ e(html_entity_decode($property->title)) }}"
+                                            data-endpoint="{{ route('site.property.enquiry', $property) }}">
                                             <i data-lucide="phone" class="w-4 h-4"></i>
-                                        </a>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -554,28 +567,455 @@
         </section>
     @endif
 
-    <!-- CTA Section -->
-    <section class="py-12 sm:py-16 md:py-20 bg-amra-dark">
+    <!-- Property Calculators -->
+    <section class="py-12 sm:py-16 md:py-20 bg-slate-50 border-y border-slate-100">
         <div class="max-w-7xl mx-auto px-4 md:px-6">
-            <div
-                class="bg-gradient-to-br from-[#0bc1b2] to-[#079186] rounded-3xl flex flex-col md:flex-row overflow-hidden shadow-2xl">
-                <div class="flex-1 p-6 sm:p-10 lg:p-16 flex flex-col justify-center items-start text-left">
-                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-white mb-4">Are You A Property Owner?</h2>
-                    <p class="text-teal-50/95 mb-6 sm:mb-8 max-w-md text-base sm:text-lg leading-relaxed font-medium">
-                        List your property for free and reach genuine buyers actively looking for homes like yours.
-                    </p>
-                    <a href="{{ route('site.sell-property-online') }}"
-                        class="inline-block bg-white text-amra-primary px-6 py-3.5 rounded-lg font-bold text-sm hover:bg-slate-50 transition-colors shadow-md flex items-center gap-2">
-                        Post Free Property Ad <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            <div class="text-center mb-8 sm:mb-12">
+                <p class="inline-flex rounded-full border border-teal-200 bg-white px-4 py-2 text-[10px] font-extrabold uppercase tracking-[0.25em] text-amra-primary">Free Tools - Amra Property</p>
+                <h2 class="mt-4 text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-slate-950">Property Financial Calculators</h2>
+                <p class="mt-2 text-sm text-slate-500">Quick tools to estimate buying costs, EMI, and loan affordability.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6">
+                <button type="button" data-calculator-open="stamp" class="group text-left rounded-2xl border border-teal-100 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-teal-500/10">
+                    <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-50 text-teal-600">
+                        <i data-lucide="file-text" class="h-5 w-5"></i>
+                    </span>
+                    <p class="mt-6 text-[10px] font-extrabold uppercase tracking-[0.25em] text-teal-600">Tax & Registration</p>
+                    <h3 class="mt-3 text-xl font-serif font-bold text-slate-950">Stamp Duty Calculator</h3>
+                    <p class="mt-3 min-h-16 text-sm leading-relaxed text-slate-500">Estimate stamp duty and registration charges for key property markets.</p>
+                    <div class="mt-5 flex flex-wrap gap-2">
+                        <span class="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-bold text-slate-500">City rates</span>
+                        <span class="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-bold text-slate-500">Buyer type</span>
+                    </div>
+                    <span class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amra-primary px-4 py-3 text-sm font-extrabold text-slate-950 transition-colors group-hover:bg-teal-300">
+                        Calculate Now <i data-lucide="arrow-right" class="h-4 w-4"></i>
+                    </span>
+                </button>
+
+                <button type="button" data-calculator-open="emi" class="group text-left rounded-2xl border border-teal-100 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-teal-500/10">
+                    <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-50 text-teal-600">
+                        <i data-lucide="calculator" class="h-5 w-5"></i>
+                    </span>
+                    <p class="mt-6 text-[10px] font-extrabold uppercase tracking-[0.25em] text-teal-600">Loan Repayment</p>
+                    <h3 class="mt-3 text-xl font-serif font-bold text-slate-950">EMI Calculator</h3>
+                    <p class="mt-3 min-h-16 text-sm leading-relaxed text-slate-500">Calculate monthly EMI, total interest, and total repayment for your home loan.</p>
+                    <div class="mt-5 flex flex-wrap gap-2">
+                        <span class="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-bold text-slate-500">Monthly EMI</span>
+                        <span class="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-bold text-slate-500">Total interest</span>
+                    </div>
+                    <span class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amra-primary px-4 py-3 text-sm font-extrabold text-slate-950 transition-colors group-hover:bg-teal-300">
+                        Calculate EMI <i data-lucide="arrow-right" class="h-4 w-4"></i>
+                    </span>
+                </button>
+
+                <button type="button" data-calculator-open="eligibility" class="group text-left rounded-2xl border border-teal-100 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-teal-500/10">
+                    <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-50 text-teal-600">
+                        <i data-lucide="landmark" class="h-5 w-5"></i>
+                    </span>
+                    <p class="mt-6 text-[10px] font-extrabold uppercase tracking-[0.25em] text-teal-600">Loan Eligibility</p>
+                    <h3 class="mt-3 text-xl font-serif font-bold text-slate-950">Home Loan Eligibility</h3>
+                    <p class="mt-3 min-h-16 text-sm leading-relaxed text-slate-500">Estimate how much loan you may qualify for based on income and existing EMIs.</p>
+                    <div class="mt-5 flex flex-wrap gap-2">
+                        <span class="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-bold text-slate-500">Max loan</span>
+                        <span class="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-bold text-slate-500">Budget range</span>
+                    </div>
+                    <span class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amra-primary px-4 py-3 text-sm font-extrabold text-slate-950 transition-colors group-hover:bg-teal-300">
+                        Check Eligibility <i data-lucide="arrow-right" class="h-4 w-4"></i>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    @if(isset($latestPosts) && $latestPosts->isNotEmpty())
+        <section class="py-12 sm:py-16 md:py-20 bg-white border-b border-slate-100">
+            <div class="max-w-7xl mx-auto px-4 md:px-6">
+                <div class="mb-8 sm:mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                    <div class="max-w-3xl">
+                        <p class="text-amra-primary font-bold uppercase tracking-[0.3em] text-[11px] mb-2 sm:mb-3">Insights & Guides</p>
+                        <h2 class="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-slate-900">Latest from the blog</h2>
+                        <p class="text-slate-500 text-xs sm:text-sm mt-2">Real estate trends, buying guides, and market updates from Amra Property.</p>
+                    </div>
+                    <a href="{{ route('site.blog') }}" class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-5 py-3 text-xs font-extrabold text-slate-700 transition-all hover:border-amra-primary hover:bg-teal-50 hover:text-slate-950">
+                        View All Articles <i data-lucide="arrow-right" class="h-4 w-4"></i>
                     </a>
                 </div>
 
-                <div class="flex-1 p-6 pt-0 md:p-0 min-h-[300px] md:min-h-full relative">
-                    <img src="{{ asset('assets/images/cta_key.png') }}" alt="Keys" class="w-full h-[250px] md:h-full object-cover rounded-2xl md:rounded-none md:absolute md:inset-0 shadow-inner">
+                <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
+                    @foreach($latestPosts as $post)
+                        <article class="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-teal-500/10">
+                            <a href="{{ route('site.blog.show', $post->slug) }}" class="block">
+                                <div class="relative h-52 overflow-hidden bg-slate-100">
+                                    @if($post->featured_image)
+                                        <img src="{{ asset($post->featured_image) }}" alt="{{ $post->title }}" class="h-full w-full object-cover card-zoom-img">
+                                    @else
+                                        <div class="flex h-full w-full items-center justify-center bg-slate-100 text-slate-300">
+                                            <i data-lucide="newspaper" class="h-10 w-10"></i>
+                                        </div>
+                                    @endif
+                                    <span class="absolute left-4 top-4 rounded-lg bg-slate-950/75 px-3 py-1.5 text-[10px] font-bold text-white backdrop-blur">
+                                        {{ $post->published_at ? $post->published_at->format('M d, Y') : $post->created_at->format('M d, Y') }}
+                                    </span>
+                                </div>
+                                <div class="p-5 sm:p-6">
+                                    <h3 class="line-clamp-2 min-h-14 text-lg font-serif font-extrabold leading-snug text-slate-900 transition-colors group-hover:text-amra-primary">
+                                        {{ $post->title }}
+                                    </h3>
+                                    <p class="mt-3 line-clamp-3 text-sm leading-relaxed text-slate-500">
+                                        {{ Str::limit(strip_tags($post->content), 130) }}
+                                    </p>
+                                    <div class="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
+                                        <span class="text-[11px] font-extrabold uppercase tracking-wider text-amra-primary">Read Article</span>
+                                        <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-50 text-amra-primary transition-colors group-hover:bg-amra-primary group-hover:text-white">
+                                            <i data-lucide="arrow-right" class="h-4 w-4"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </a>
+                        </article>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+
+    <!-- Helpful Property Links -->
+    <section class="bg-white border-y border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 md:px-6">
+            @php
+                $propertyLinkTabs = [
+                    'buyers' => [
+                        'label' => 'For Buyers',
+                        'heading' => 'Popular searches for buyers',
+                        'links' => [
+                            ['label' => 'Flats for sale in Mumbai', 'url' => route('site.property', ['listing_type' => 'sale', 'type' => 'flat', 'location' => 'Mumbai'])],
+                            ['label' => 'Flats for sale in Thane', 'url' => route('site.property', ['listing_type' => 'sale', 'type' => 'flat', 'location' => 'Thane'])],
+                            ['label' => 'Flats for sale in Navi Mumbai', 'url' => route('site.property', ['listing_type' => 'sale', 'type' => 'flat', 'location' => 'Navi Mumbai'])],
+                            ['label' => 'Properties for sale in Panvel', 'url' => route('site.property', ['listing_type' => 'sale', 'location' => 'Panvel'])],
+                            ['label' => 'Villas for sale in Lucknow', 'url' => route('site.property', ['listing_type' => 'sale', 'type' => 'villa', 'location' => 'Lucknow'])],
+                            ['label' => 'Properties for sale in Jaipur', 'url' => route('site.property', ['listing_type' => 'sale', 'location' => 'Jaipur'])],
+                            ['label' => 'Dubai properties for sale', 'url' => route('site.property', ['listing_type' => 'sale', 'location' => 'Dubai'])],
+                            ['label' => 'Ready to move properties', 'url' => route('site.property', ['tag' => 'ready-to-move'])],
+                        ],
+                    ],
+                    'tenants' => [
+                        'label' => 'For Tenants',
+                        'heading' => 'Popular searches for tenants',
+                        'links' => [
+                            ['label' => 'Flats for rent in Mumbai', 'url' => route('site.property', ['listing_type' => 'rent', 'type' => 'flat', 'location' => 'Mumbai'])],
+                            ['label' => 'Flats for rent in Thane', 'url' => route('site.property', ['listing_type' => 'rent', 'type' => 'flat', 'location' => 'Thane'])],
+                            ['label' => 'Flats for rent in Navi Mumbai', 'url' => route('site.property', ['listing_type' => 'rent', 'type' => 'flat', 'location' => 'Navi Mumbai'])],
+                            ['label' => 'Properties for rent in Panvel', 'url' => route('site.property', ['listing_type' => 'rent', 'location' => 'Panvel'])],
+                            ['label' => 'Properties for rent in Lucknow', 'url' => route('site.property', ['listing_type' => 'rent', 'location' => 'Lucknow'])],
+                            ['label' => 'Commercial properties for rent', 'url' => route('site.property', ['listing_type' => 'rent', 'type' => 'commercial'])],
+                            ['label' => 'Gated community rentals', 'url' => route('site.property', ['listing_type' => 'rent', 'tag' => 'gated-community'])],
+                            ['label' => 'Family friendly rentals', 'url' => route('site.property', ['listing_type' => 'rent', 'tag' => 'family-friendly'])],
+                            ['label' => 'Properties near transit hubs', 'url' => route('site.property', ['listing_type' => 'rent', 'tag' => 'near-metro'])],
+                        ],
+                    ],
+                    'projects' => [
+                        'label' => 'Projects',
+                        'heading' => 'Explore property projects',
+                        'links' => [
+                            ['label' => 'New launch projects', 'url' => route('site.property', ['tag' => 'new-launch'])],
+                            ['label' => 'RERA approved projects', 'url' => route('site.property', ['tag' => 'rera-approved'])],
+                            ['label' => 'Premium builder projects', 'url' => route('site.property', ['tag' => 'premium-builder'])],
+                            ['label' => 'Under construction projects', 'url' => route('site.property', ['tag' => 'under-construction'])],
+                            ['label' => 'Possession soon projects', 'url' => route('site.property', ['tag' => 'possession-soon'])],
+                            ['label' => 'Luxury projects', 'url' => route('site.property', ['tag' => 'luxury'])],
+                            ['label' => 'Affordable projects', 'url' => route('site.property', ['tag' => 'affordable'])],
+                            ['label' => 'Investment properties', 'url' => route('site.property', ['tag' => 'investment'])],
+                        ],
+                    ],
+                    'cities' => [
+                        'label' => 'Popular Cities',
+                        'heading' => 'Browse by city and property type',
+                        'links' => [
+                            ['label' => 'Properties in Mumbai', 'url' => route('site.property', ['location' => 'Mumbai'])],
+                            ['label' => 'Properties in Thane', 'url' => route('site.property', ['location' => 'Thane'])],
+                            ['label' => 'Properties in Navi Mumbai', 'url' => route('site.property', ['location' => 'Navi Mumbai'])],
+                            ['label' => 'Properties in Panvel', 'url' => route('site.property', ['location' => 'Panvel'])],
+                            ['label' => 'Lucknow flats', 'url' => route('site.property', ['location' => 'Lucknow', 'type' => 'flat'])],
+                            ['label' => 'Properties in Jaipur', 'url' => route('site.property', ['location' => 'Jaipur'])],
+                            ['label' => 'Properties in Dubai', 'url' => route('site.property', ['location' => 'Dubai'])],
+                            ['label' => 'Properties in Nashik', 'url' => route('site.property', ['location' => 'Nashik'])],
+                        ],
+                    ],
+                    'popular' => [
+                        'label' => 'Popular Searches',
+                        'heading' => 'Helpful property related searches',
+                        'links' => [
+                            ['label' => '1 BHK flats', 'url' => route('site.property', ['q' => '1BHK'])],
+                            ['label' => '2 BHK flats', 'url' => route('site.property', ['q' => '2BHK'])],
+                            ['label' => '3 BHK flats', 'url' => route('site.property', ['q' => '3BHK'])],
+                            ['label' => '4 BHK flats', 'url' => route('site.property', ['q' => '4BHK'])],
+                            ['label' => 'Luxury homes', 'url' => route('site.property', ['tag' => 'luxury'])],
+                            ['label' => 'High ROI properties', 'url' => route('site.property', ['tag' => 'high-roi'])],
+                            ['label' => 'Resale properties', 'url' => route('site.property', ['tag' => 'resale'])],
+                            ['label' => 'All properties', 'url' => route('site.property')],
+                        ],
+                    ],
+                ];
+            @endphp
+
+            <div class="overflow-x-auto border-b border-slate-200">
+                <div class="flex min-w-max justify-between gap-3 md:gap-8">
+                    @foreach($propertyLinkTabs as $tabKey => $tab)
+                        <button type="button"
+                            class="home-link-tab relative px-4 py-5 text-xs sm:text-sm font-bold uppercase tracking-wide {{ $loop->first ? 'text-slate-950' : 'text-slate-500' }} transition-colors hover:text-slate-950 md:flex-1"
+                            data-target="property-links-{{ $tabKey }}"
+                            aria-controls="property-links-{{ $tabKey }}"
+                            aria-selected="{{ $loop->first ? 'true' : 'false' }}">
+                            {{ $tab['label'] }}
+                            <span class="home-link-tab-line absolute inset-x-0 bottom-0 h-0.5 bg-amra-primary {{ $loop->first ? '' : 'hidden' }}"></span>
+                        </button>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="py-7 sm:py-8">
+                @foreach($propertyLinkTabs as $tabKey => $tab)
+                    <div id="property-links-{{ $tabKey }}" class="home-link-panel {{ $loop->first ? '' : 'hidden' }}">
+                        <h2 class="text-base sm:text-lg font-extrabold text-slate-950 mb-5">{{ $tab['heading'] }}</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-3">
+                            @foreach($tab['links'] as $link)
+                                <a href="{{ $link['url'] }}" class="group flex items-center justify-between gap-3 text-sm font-semibold text-slate-600 hover:text-amra-primary transition-colors">
+                                    <span>{{ $link['label'] }}</span>
+                                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-300 group-hover:text-amra-primary transition-colors"></i>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="bg-white border-b border-slate-100 py-6 sm:py-8">
+        <div class="max-w-7xl mx-auto px-4 md:px-6">
+            <div class="rounded-2xl border border-teal-100 bg-teal-50 px-5 py-4 sm:px-7 sm:py-5 shadow-sm">
+                <div class="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-serif font-bold text-slate-950">Are You A Property Owner?</h2>
+                        <p class="mt-1 max-w-2xl text-sm text-slate-600 font-medium">
+                        List your property for free and reach genuine buyers actively looking for homes like yours.
+                        </p>
+                    </div>
+                    <a href="{{ route('site.sell-property-online') }}"
+                        class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-amra-primary px-5 py-3 text-sm font-extrabold text-slate-950 shadow-sm transition-colors hover:bg-teal-300">
+                        Post Free Property Ad <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
                 </div>
             </div>
         </div>
     </section>
+
+    <style>
+        .calculator-radio {
+            display: flex;
+            cursor: pointer;
+        }
+
+        .calculator-radio input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .calculator-radio span {
+            width: 100%;
+            border-radius: 0.75rem;
+            border: 1px solid rgb(226 232 240);
+            background: rgb(248 250 252);
+            padding: 0.75rem 1rem;
+            text-align: center;
+            font-size: 0.8125rem;
+            font-weight: 800;
+            color: rgb(71 85 105);
+            transition: all 180ms ease;
+        }
+
+        .calculator-radio input:checked + span {
+            border-color: rgb(20 184 166);
+            background: rgb(204 251 241);
+            color: rgb(15 23 42);
+            box-shadow: 0 8px 18px rgba(20, 184, 166, 0.16);
+        }
+
+        .calculator-submit {
+            display: inline-flex;
+            width: 100%;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.75rem;
+            background: #0bc1b2;
+            padding: 0.875rem 1.25rem;
+            font-size: 0.875rem;
+            font-weight: 900;
+            color: rgb(15 23 42);
+            transition: background 180ms ease, transform 180ms ease;
+        }
+
+        .calculator-submit:hover {
+            background: rgb(94 234 212);
+            transform: translateY(-1px);
+        }
+
+        .calculator-result {
+            border-radius: 1rem;
+            border: 1px solid rgb(153 246 228);
+            background: rgb(240 253 250);
+            padding: 1rem;
+        }
+    </style>
+
+    <div id="calculator-modal" class="fixed inset-0 z-[130] hidden items-center justify-center bg-slate-950/65 px-4 py-6 backdrop-blur-sm">
+        <div class="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white shadow-2xl">
+            <div class="sticky top-0 z-10 border-b border-slate-100 bg-white/95 px-5 py-5 backdrop-blur sm:px-7">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <p id="calculator-kicker" class="text-[10px] font-extrabold uppercase tracking-[0.25em] text-amra-primary">Free Tool</p>
+                        <h3 id="calculator-title" class="mt-2 text-2xl font-serif font-bold text-slate-950">Calculator</h3>
+                        <p id="calculator-subtitle" class="mt-1 text-sm text-slate-500"></p>
+                    </div>
+                    <button type="button" id="calculator-close" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition-colors hover:bg-slate-200" aria-label="Close calculator">
+                        <i data-lucide="x" class="h-4 w-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-5 sm:p-7">
+                <form id="stamp-calculator" class="calculator-panel hidden space-y-5">
+                    <label class="block">
+                        <span class="mb-1.5 block text-[10px] font-extrabold uppercase tracking-wider text-slate-500">City / Location</span>
+                        <select id="stamp-city" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-800 outline-none focus:border-teal-500 focus:bg-white">
+                            <option value="mumbai">Mumbai / MMR</option>
+                            <option value="thane">Thane</option>
+                            <option value="navi-mumbai">Navi Mumbai</option>
+                            <option value="panvel">Panvel</option>
+                            <option value="lucknow">Lucknow</option>
+                            <option value="jaipur">Jaipur</option>
+                            <option value="nashik">Nashik</option>
+                        </select>
+                    </label>
+                    <div>
+                        <span class="mb-2 block text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Buyer Type</span>
+                        <div class="grid grid-cols-3 gap-2">
+                            <label class="calculator-radio"><input type="radio" name="stamp_buyer" value="male" checked><span>Male</span></label>
+                            <label class="calculator-radio"><input type="radio" name="stamp_buyer" value="female"><span>Female</span></label>
+                            <label class="calculator-radio"><input type="radio" name="stamp_buyer" value="joint"><span>Joint</span></label>
+                        </div>
+                    </div>
+                    <label class="block">
+                        <span class="mb-1.5 block text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Property Value</span>
+                        <input id="stamp-value" type="number" min="0" placeholder="e.g. 8500000" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-800 outline-none focus:border-teal-500 focus:bg-white">
+                    </label>
+                    <button type="submit" class="calculator-submit">Calculate Stamp Duty</button>
+                    <div id="stamp-result" class="calculator-result hidden"></div>
+                </form>
+
+                <form id="emi-calculator" class="calculator-panel hidden space-y-5">
+                    <label class="block">
+                        <span class="mb-1.5 block text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Loan Amount</span>
+                        <input id="emi-amount" type="number" min="0" placeholder="e.g. 5000000" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-800 outline-none focus:border-teal-500 focus:bg-white">
+                    </label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <label class="block">
+                            <span class="mb-1.5 block text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Interest Rate (% p.a.)</span>
+                            <input id="emi-rate" type="number" min="0" step="0.01" value="8.5" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-800 outline-none focus:border-teal-500 focus:bg-white">
+                        </label>
+                        <label class="block">
+                            <span class="mb-1.5 block text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Tenure (Years)</span>
+                            <input id="emi-years" type="number" min="1" value="20" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-800 outline-none focus:border-teal-500 focus:bg-white">
+                        </label>
+                    </div>
+                    <button type="submit" class="calculator-submit">Calculate EMI</button>
+                    <div id="emi-result" class="calculator-result hidden"></div>
+                </form>
+
+                <form id="eligibility-calculator" class="calculator-panel hidden space-y-5">
+                    <div>
+                        <span class="mb-2 block text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Employment Type</span>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="calculator-radio"><input type="radio" name="employment_type" value="salaried" checked><span>Salaried</span></label>
+                            <label class="calculator-radio"><input type="radio" name="employment_type" value="self"><span>Self-employed</span></label>
+                        </div>
+                    </div>
+                    <label class="block">
+                        <span class="mb-1.5 block text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Net Monthly Income</span>
+                        <input id="eligibility-income" type="number" min="0" placeholder="e.g. 80000" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-800 outline-none focus:border-teal-500 focus:bg-white">
+                    </label>
+                    <label class="block">
+                        <span class="mb-1.5 block text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Existing Monthly EMIs</span>
+                        <input id="eligibility-existing-emi" type="number" min="0" value="0" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-800 outline-none focus:border-teal-500 focus:bg-white">
+                    </label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <label class="block">
+                            <span class="mb-1.5 block text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Interest Rate (% p.a.)</span>
+                            <input id="eligibility-rate" type="number" min="0" step="0.01" value="8.5" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-800 outline-none focus:border-teal-500 focus:bg-white">
+                        </label>
+                        <label class="block">
+                            <span class="mb-1.5 block text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Tenure (Years)</span>
+                            <input id="eligibility-years" type="number" min="1" value="20" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-800 outline-none focus:border-teal-500 focus:bg-white">
+                        </label>
+                    </div>
+                    <button type="submit" class="calculator-submit">Check Eligibility</button>
+                    <div id="eligibility-result" class="calculator-result hidden"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="home-property-contact-modal" class="fixed inset-0 z-[125] hidden items-center justify-center bg-slate-950/60 px-4 py-6 backdrop-blur-sm">
+        <div class="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
+            <div class="mb-5 flex items-start justify-between gap-4">
+                <div>
+                    <p class="text-[10px] font-bold uppercase tracking-[0.25em] text-teal-500">Unlock Contact</p>
+                    <h3 id="home-property-contact-title" class="mt-2 text-xl font-serif font-extrabold leading-snug text-slate-900">Get property details</h3>
+                    <p class="mt-2 text-xs leading-relaxed text-slate-500">Share your details once. We will save your enquiry and reveal the seller contact.</p>
+                </div>
+                <button type="button" id="home-property-contact-close" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200">
+                    <i data-lucide="x" class="h-4 w-4"></i>
+                </button>
+            </div>
+
+            <form id="home-property-contact-form" class="space-y-3">
+                @csrf
+                <input type="hidden" id="home-property-contact-action" value="whatsapp">
+                <input type="hidden" id="home-property-contact-endpoint" value="">
+                <label class="block">
+                    <span class="mb-1 block text-[10px] font-bold uppercase tracking-wider text-slate-500">Name</span>
+                    <input id="home-property-contact-name" type="text" required class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold outline-none focus:border-teal-500 focus:bg-white" placeholder="Your name">
+                </label>
+                <label class="block">
+                    <span class="mb-1 block text-[10px] font-bold uppercase tracking-wider text-slate-500">Phone</span>
+                    <input id="home-property-contact-phone" type="tel" required class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold outline-none focus:border-teal-500 focus:bg-white" placeholder="Your phone number">
+                </label>
+                <label class="block">
+                    <span class="mb-1 block text-[10px] font-bold uppercase tracking-wider text-slate-500">Email</span>
+                    <input id="home-property-contact-email" type="email" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold outline-none focus:border-teal-500 focus:bg-white" placeholder="Optional">
+                </label>
+                <button id="home-property-contact-submit" type="submit" class="flex w-full items-center justify-center gap-2 rounded-xl bg-teal-500 px-5 py-3.5 text-sm font-extrabold text-white transition-all hover:bg-teal-600">
+                    <i data-lucide="send" class="h-4 w-4"></i>
+                    Save Enquiry & Show Contact
+                </button>
+            </form>
+
+            <div id="home-property-contact-unlocked" class="mt-4 hidden rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+                <p class="mb-3 text-xs font-bold text-emerald-800">Contact unlocked</p>
+                <div class="flex flex-col gap-2 sm:flex-row">
+                    <a id="home-property-contact-phone-link" href="#" class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-xs font-bold text-emerald-700">
+                        <i data-lucide="phone" class="h-4 w-4"></i><span></span>
+                    </a>
+                    <a id="home-property-contact-whatsapp-link" href="#" target="_blank" rel="noopener noreferrer" class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-3 text-xs font-bold text-white">
+                        <i data-lucide="send" class="h-4 w-4"></i> WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="home-seller-contact-modal" class="fixed inset-0 z-[120] hidden items-center justify-center bg-slate-950/60 px-4 py-6 backdrop-blur-sm">
         <div class="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
@@ -634,6 +1074,7 @@
             const btnAll = document.getElementById('toggle-all');
             const btnSale = document.getElementById('toggle-sale');
             const btnRent = document.getElementById('toggle-rent');
+            const budgetRange = document.getElementById('home-budget-range');
             
             const inactiveClass = 'px-4 py-2 sm:px-5 sm:py-2.5 rounded-t-xl font-extrabold text-xs sm:text-sm transition-all bg-white text-slate-400 hover:text-teal-600 border-t border-x border-b border-gray-200/80 shadow-[inset_0_-2px_3px_rgba(0,0,0,0.03)] relative z-10';
             const activeClass = 'px-4 py-2 sm:px-5 sm:py-2.5 rounded-t-xl font-extrabold text-xs sm:text-sm transition-all bg-white text-teal-600 border-t border-x border-gray-200 relative z-20';
@@ -641,6 +1082,10 @@
             btnAll.className = (type === '') ? activeClass : inactiveClass;
             btnSale.className = (type === 'sale') ? activeClass : inactiveClass;
             btnRent.className = (type === 'rent') ? activeClass : inactiveClass;
+
+            if (budgetRange) {
+                budgetRange.classList.toggle('hidden', type === 'rent');
+            }
         }
 
         // Budget Slider Formatting
@@ -711,29 +1156,74 @@
         const homeQuery = document.getElementById('home-query');
         const homeLocation = document.getElementById('home-location');
         const homeType = document.getElementById('home-type');
+        const homeLocationStatus = document.getElementById('home-location-status');
+
+        const supportedMarkets = [
+            { name: 'Mumbai', lat: 19.076, lng: 72.8777, radiusKm: 35 },
+            { name: 'Thane', lat: 19.2183, lng: 72.9781, radiusKm: 25 },
+            { name: 'Navi Mumbai', lat: 19.033, lng: 73.0297, radiusKm: 28 },
+            { name: 'Panvel', lat: 18.9894, lng: 73.1175, radiusKm: 25 },
+            { name: 'Dombivli', lat: 19.2184, lng: 73.0867, radiusKm: 18 },
+            { name: 'Lucknow', lat: 26.8467, lng: 80.9462, radiusKm: 45 },
+            { name: 'Jaipur', lat: 26.9124, lng: 75.7873, radiusKm: 45 },
+            { name: 'Nashik', lat: 19.9975, lng: 73.7898, radiusKm: 35 },
+            { name: 'Varanasi', lat: 25.3176, lng: 82.9739, radiusKm: 35 },
+            { name: 'Dubai', lat: 25.2048, lng: 55.2708, radiusKm: 55 },
+        ];
+
+        function distanceKm(lat1, lng1, lat2, lng2) {
+            const earthRadiusKm = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180)
+                * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+            return earthRadiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        function nearestSupportedMarket(latitude, longitude) {
+            return supportedMarkets
+                .map((market) => ({
+                    ...market,
+                    distance: distanceKm(latitude, longitude, market.lat, market.lng),
+                }))
+                .filter((market) => market.distance <= market.radiusKm)
+                .sort((a, b) => a.distance - b.distance)[0] || null;
+        }
+
+        function setHomeLocation(locationName, source = 'saved') {
+            if (!homeLocation || !locationName) return;
+
+            const matchingOption = [...homeLocation.options].find((option) => (
+                option.value.toLowerCase() === locationName.toLowerCase()
+            ));
+
+            if (!matchingOption) return;
+
+            homeLocation.value = matchingOption.value;
+
+            if (homeLocationStatus) {
+                homeLocationStatus.textContent = source === 'detected' ? `Near ${matchingOption.text}` : `Saved ${matchingOption.text}`;
+                homeLocationStatus.classList.remove('hidden');
+            }
+        }
 
         // Auto Location Detection on Page Load
         if (navigator.geolocation && !localStorage.getItem('amra_location_detected') && !localStorage.getItem('amra_location_prompted')) {
             navigator.geolocation.getCurrentPosition((position) => {
                 const { latitude, longitude } = position.coords;
-                const location = latitude > 18 && latitude < 20 && longitude > 72 && longitude < 74 ? 'mumbai'
-                    : latitude > 25 && latitude < 28 && longitude > 79 && longitude < 82 ? 'lucknow'
-                    : '';
-                if (location) {
-                    localStorage.setItem('amra_location_detected', location);
-                    localStorage.setItem('amra_location_prompted', '1');
-                    if (homeLocation) {
-                        homeLocation.value = location.charAt(0).toUpperCase() + location.slice(1);
-                    }
+                const market = nearestSupportedMarket(latitude, longitude);
+                localStorage.setItem('amra_location_prompted', '1');
+                if (market) {
+                    localStorage.setItem('amra_location_detected', market.name);
+                    setHomeLocation(market.name, 'detected');
                 }
             }, () => {
                 localStorage.setItem('amra_location_prompted', '1');
             });
         } else if (localStorage.getItem('amra_location_detected')) {
             const savedLocation = localStorage.getItem('amra_location_detected');
-            if (homeLocation) {
-                homeLocation.value = savedLocation;
-            }
+            setHomeLocation(savedLocation, 'saved');
         }
 
         if (homeSearchBtn) {
@@ -742,16 +1232,345 @@
                 const loc = homeLocation ? homeLocation.value : '';
                 const type = homeType ? homeType.value : '';
                 const listingType = document.getElementById('home-listing-type').value;
+                const params = new URLSearchParams();
                 
-                let minVal = parseInt(minPriceInput.value);
-                let maxVal = parseInt(maxPriceInput.value);
-                if (minVal > maxVal) {
-                    let temp = minVal;
-                    minVal = maxVal;
-                    maxVal = temp;
+                if (query) params.set('q', query);
+                if (loc) params.set('location', loc);
+                if (type) params.set('type', type);
+                if (listingType) params.set('listing_type', listingType);
+
+                if (listingType !== 'rent') {
+                    let minVal = parseInt(minPriceInput.value);
+                    let maxVal = parseInt(maxPriceInput.value);
+                    if (minVal > maxVal) {
+                        let temp = minVal;
+                        minVal = maxVal;
+                        maxVal = temp;
+                    }
+                    params.set('min_price', minVal);
+                    params.set('max_price', maxVal);
                 }
 
-                window.location.href = `{{ route('site.property') }}?q=${encodeURIComponent(query)}&location=${encodeURIComponent(loc)}&type=${encodeURIComponent(type)}&listing_type=${encodeURIComponent(listingType)}&min_price=${minVal}&max_price=${maxVal}`;
+                const queryString = params.toString();
+                window.location.href = `{{ route('site.property') }}${queryString ? `?${queryString}` : ''}`;
+            });
+        }
+
+        document.querySelectorAll('.home-link-tab').forEach((tab) => {
+            tab.addEventListener('click', () => {
+                const targetId = tab.dataset.target;
+
+                document.querySelectorAll('.home-link-tab').forEach((button) => {
+                    const isActive = button === tab;
+                    button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+                    button.classList.toggle('text-slate-950', isActive);
+                    button.classList.toggle('text-slate-500', !isActive);
+                    button.querySelector('.home-link-tab-line')?.classList.toggle('hidden', !isActive);
+                });
+
+                document.querySelectorAll('.home-link-panel').forEach((panel) => {
+                    panel.classList.toggle('hidden', panel.id !== targetId);
+                });
+            });
+        });
+
+        const calculatorModal = document.getElementById('calculator-modal');
+        const calculatorClose = document.getElementById('calculator-close');
+        const calculatorTitle = document.getElementById('calculator-title');
+        const calculatorKicker = document.getElementById('calculator-kicker');
+        const calculatorSubtitle = document.getElementById('calculator-subtitle');
+        const calculatorPanels = document.querySelectorAll('.calculator-panel');
+        const calculatorCopy = {
+            stamp: {
+                title: 'Stamp Duty Calculator',
+                kicker: 'Tax & Registration',
+                subtitle: 'Estimate stamp duty and registration charges for common city rates.',
+                panel: 'stamp-calculator',
+            },
+            emi: {
+                title: 'EMI Calculator',
+                kicker: 'Loan Repayment',
+                subtitle: 'Calculate your monthly EMI, total interest, and total payable amount.',
+                panel: 'emi-calculator',
+            },
+            eligibility: {
+                title: 'Home Loan Eligibility',
+                kicker: 'Loan Eligibility',
+                subtitle: 'Estimate the loan amount and property budget your income may support.',
+                panel: 'eligibility-calculator',
+            },
+        };
+
+        function openCalculator(type) {
+            const config = calculatorCopy[type];
+            if (!calculatorModal || !config) return;
+
+            calculatorTitle.textContent = config.title;
+            calculatorKicker.textContent = config.kicker;
+            calculatorSubtitle.textContent = config.subtitle;
+            calculatorPanels.forEach((panel) => {
+                panel.classList.toggle('hidden', panel.id !== config.panel);
+            });
+            calculatorModal.classList.remove('hidden');
+            calculatorModal.classList.add('flex');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        function closeCalculator() {
+            if (!calculatorModal) return;
+            calculatorModal.classList.add('hidden');
+            calculatorModal.classList.remove('flex');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        function inr(value) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 0,
+            }).format(Math.max(0, Math.round(value || 0)));
+        }
+
+        function loanPrincipalFromEmi(emi, annualRate, years) {
+            const months = Math.max(1, years * 12);
+            const monthlyRate = annualRate / 12 / 100;
+            if (!monthlyRate) return emi * months;
+            const compound = Math.pow(1 + monthlyRate, months);
+            return emi * ((compound - 1) / (monthlyRate * compound));
+        }
+
+        function showCalculatorResult(element, rows) {
+            if (!element) return;
+            element.innerHTML = rows.map((row) => `
+                <div class="flex items-center justify-between gap-4 border-b border-teal-100 py-2 last:border-b-0">
+                    <span class="text-xs font-bold text-slate-500">${row.label}</span>
+                    <strong class="text-sm sm:text-base font-extrabold text-slate-950">${row.value}</strong>
+                </div>
+            `).join('');
+            element.classList.remove('hidden');
+        }
+
+        document.querySelectorAll('[data-calculator-open]').forEach((button) => {
+            button.addEventListener('click', () => openCalculator(button.dataset.calculatorOpen));
+        });
+
+        if (calculatorClose) calculatorClose.addEventListener('click', closeCalculator);
+        if (calculatorModal) {
+            calculatorModal.addEventListener('click', (event) => {
+                if (event.target === calculatorModal) closeCalculator();
+            });
+        }
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && calculatorModal && !calculatorModal.classList.contains('hidden')) {
+                closeCalculator();
+            }
+        });
+
+        const stampRates = {
+            mumbai: { male: 0.06, female: 0.05, joint: 0.055 },
+            thane: { male: 0.06, female: 0.05, joint: 0.055 },
+            'navi-mumbai': { male: 0.06, female: 0.05, joint: 0.055 },
+            panvel: { male: 0.06, female: 0.05, joint: 0.055 },
+            lucknow: { male: 0.07, female: 0.06, joint: 0.065 },
+            jaipur: { male: 0.06, female: 0.05, joint: 0.055 },
+            nashik: { male: 0.06, female: 0.05, joint: 0.055 },
+        };
+
+        const stampForm = document.getElementById('stamp-calculator');
+        if (stampForm) {
+            stampForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const city = document.getElementById('stamp-city').value;
+                const buyer = document.querySelector('input[name="stamp_buyer"]:checked')?.value || 'male';
+                const propertyValue = Number(document.getElementById('stamp-value').value);
+                if (!propertyValue) return;
+
+                const rate = stampRates[city]?.[buyer] || 0.06;
+                const stampDuty = propertyValue * rate;
+                const registration = Math.min(propertyValue * 0.01, 30000);
+                showCalculatorResult(document.getElementById('stamp-result'), [
+                    { label: 'Stamp duty', value: inr(stampDuty) },
+                    { label: 'Registration estimate', value: inr(registration) },
+                    { label: 'Total government charges', value: inr(stampDuty + registration) },
+                ]);
+            });
+        }
+
+        const emiForm = document.getElementById('emi-calculator');
+        if (emiForm) {
+            emiForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const amount = Number(document.getElementById('emi-amount').value);
+                const rate = Number(document.getElementById('emi-rate').value);
+                const years = Number(document.getElementById('emi-years').value);
+                if (!amount || !years) return;
+
+                const months = years * 12;
+                const monthlyRate = rate / 12 / 100;
+                const compound = Math.pow(1 + monthlyRate, months);
+                const emi = monthlyRate ? amount * monthlyRate * compound / (compound - 1) : amount / months;
+                const totalPayable = emi * months;
+                showCalculatorResult(document.getElementById('emi-result'), [
+                    { label: 'Monthly EMI', value: inr(emi) },
+                    { label: 'Total interest', value: inr(totalPayable - amount) },
+                    { label: 'Total payable', value: inr(totalPayable) },
+                ]);
+            });
+        }
+
+        const eligibilityForm = document.getElementById('eligibility-calculator');
+        if (eligibilityForm) {
+            eligibilityForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const employment = document.querySelector('input[name="employment_type"]:checked')?.value || 'salaried';
+                const income = Number(document.getElementById('eligibility-income').value);
+                const existingEmi = Number(document.getElementById('eligibility-existing-emi').value);
+                const rate = Number(document.getElementById('eligibility-rate').value);
+                const years = Number(document.getElementById('eligibility-years').value);
+                if (!income || !years) return;
+
+                const foir = employment === 'self' ? 0.5 : 0.55;
+                const availableEmi = Math.max(0, income * foir - existingEmi);
+                const maxLoan = loanPrincipalFromEmi(availableEmi, rate, years);
+                showCalculatorResult(document.getElementById('eligibility-result'), [
+                    { label: 'Affordable monthly EMI', value: inr(availableEmi) },
+                    { label: 'Estimated max loan', value: inr(maxLoan) },
+                    { label: 'Estimated property budget', value: inr(maxLoan / 0.8) },
+                ]);
+            });
+        }
+
+        const homePropertyContactModal = document.getElementById('home-property-contact-modal');
+        const homePropertyContactClose = document.getElementById('home-property-contact-close');
+        const homePropertyContactForm = document.getElementById('home-property-contact-form');
+        const homePropertyContactSubmit = document.getElementById('home-property-contact-submit');
+        const homePropertyContactTitle = document.getElementById('home-property-contact-title');
+        const homePropertyContactAction = document.getElementById('home-property-contact-action');
+        const homePropertyContactEndpoint = document.getElementById('home-property-contact-endpoint');
+        const homePropertyContactUnlocked = document.getElementById('home-property-contact-unlocked');
+        const homePropertyContactPhoneLink = document.getElementById('home-property-contact-phone-link');
+        const homePropertyContactWhatsappLink = document.getElementById('home-property-contact-whatsapp-link');
+        let homePropertyContactInFlight = false;
+
+        function setHomePropertyContactButtonsDisabled(disabled) {
+            document.querySelectorAll('.home-property-contact-trigger').forEach((button) => {
+                button.disabled = disabled;
+                button.classList.toggle('pointer-events-none', disabled);
+                button.classList.toggle('opacity-60', disabled);
+            });
+        }
+
+        function closeHomePropertyContactModal() {
+            if (!homePropertyContactModal) return;
+            homePropertyContactModal.classList.add('hidden');
+            homePropertyContactModal.classList.remove('flex');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedName = localStorage.getItem('amra_enquiry_name');
+            const savedPhone = localStorage.getItem('amra_enquiry_phone');
+            const savedEmail = localStorage.getItem('amra_enquiry_email');
+
+            if (savedName && savedPhone) {
+                if (document.getElementById('home-property-contact-name')) document.getElementById('home-property-contact-name').value = savedName;
+                if (document.getElementById('home-property-contact-phone')) document.getElementById('home-property-contact-phone').value = savedPhone;
+                if (savedEmail && document.getElementById('home-property-contact-email')) document.getElementById('home-property-contact-email').value = savedEmail;
+            }
+        });
+
+        document.querySelectorAll('.home-property-contact-trigger').forEach((button) => {
+            button.addEventListener('click', () => {
+                if (homePropertyContactInFlight) return;
+
+                homePropertyContactAction.value = button.dataset.action || 'whatsapp';
+                homePropertyContactEndpoint.value = button.dataset.endpoint;
+                homePropertyContactTitle.textContent = button.dataset.propertyTitle || 'Get property details';
+                homePropertyContactUnlocked.classList.add('hidden');
+                homePropertyContactSubmit.disabled = false;
+                homePropertyContactSubmit.innerHTML = '<i data-lucide="send" class="h-4 w-4"></i> Save Enquiry & Show Contact';
+                homePropertyContactModal.classList.remove('hidden');
+                homePropertyContactModal.classList.add('flex');
+                document.body.classList.add('overflow-hidden');
+                if (window.lucide) window.lucide.createIcons();
+
+                const savedName = localStorage.getItem('amra_enquiry_name');
+                const savedPhone = localStorage.getItem('amra_enquiry_phone');
+                if (savedName && savedPhone) {
+                    homePropertyContactForm.dispatchEvent(new Event('submit', { cancelable: true }));
+                }
+            });
+        });
+
+        if (homePropertyContactClose) homePropertyContactClose.addEventListener('click', closeHomePropertyContactModal);
+        if (homePropertyContactModal) {
+            homePropertyContactModal.addEventListener('click', (event) => {
+                if (event.target === homePropertyContactModal) closeHomePropertyContactModal();
+            });
+        }
+
+        if (homePropertyContactForm) {
+            homePropertyContactForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                if (homePropertyContactInFlight) return;
+
+                homePropertyContactInFlight = true;
+                setHomePropertyContactButtonsDisabled(true);
+                homePropertyContactSubmit.disabled = true;
+                homePropertyContactSubmit.textContent = 'Saving...';
+
+                const action = homePropertyContactAction.value || 'whatsapp';
+                const nameVal = document.getElementById('home-property-contact-name').value;
+                const phoneVal = document.getElementById('home-property-contact-phone').value;
+                const emailVal = document.getElementById('home-property-contact-email').value;
+
+                fetch(homePropertyContactEndpoint.value, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    },
+                    body: JSON.stringify({
+                        name: nameVal,
+                        phone: phoneVal,
+                        email: emailVal,
+                        source: `${action}_homepage_featured_card`,
+                        intent: action,
+                    }),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (!data.success) throw new Error(data.message || 'Unable to save enquiry.');
+
+                        localStorage.setItem('amra_enquiry_name', nameVal);
+                        localStorage.setItem('amra_enquiry_phone', phoneVal);
+                        localStorage.setItem('amra_enquiry_email', emailVal);
+
+                        homePropertyContactPhoneLink.href = `tel:${data.phone}`;
+                        homePropertyContactPhoneLink.querySelector('span').textContent = data.phone;
+                        homePropertyContactWhatsappLink.href = data.whatsapp_url;
+                        homePropertyContactUnlocked.classList.remove('hidden');
+                        homePropertyContactSubmit.innerHTML = '<i data-lucide="check" class="h-4 w-4"></i> Enquiry Saved';
+                        if (window.lucide) window.lucide.createIcons();
+
+                        if (action === 'whatsapp') {
+                            window.open(data.whatsapp_url, '_blank', 'noopener');
+                        } else {
+                            window.location.href = `tel:${data.phone}`;
+                        }
+                    })
+                    .catch((error) => {
+                        alert(error.message || 'Unable to save enquiry.');
+                        homePropertyContactSubmit.disabled = false;
+                        homePropertyContactSubmit.innerHTML = '<i data-lucide="send" class="h-4 w-4"></i> Save Enquiry & Show Contact';
+                        if (window.lucide) window.lucide.createIcons();
+                    })
+                    .finally(() => {
+                        homePropertyContactInFlight = false;
+                        setHomePropertyContactButtonsDisabled(false);
+                    });
             });
         }
 

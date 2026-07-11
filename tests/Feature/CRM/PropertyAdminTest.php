@@ -70,6 +70,7 @@ class PropertyAdminTest extends TestCase
             'configuration' => 'Villa',
             'developer_name' => 'Apex Infra Group',
             'status' => 'publish',
+            'listing_type' => 'sale',
             'is_featured' => '1',
             'is_rera_approved' => '1',
             'amenities' => ['Swimming Pool', 'Gymnasium'],
@@ -107,6 +108,7 @@ class PropertyAdminTest extends TestCase
             'city' => 'Mumbai',
             'configuration' => '2BHK',
             'status' => 'publish',
+            'listing_type' => 'sale',
         ]);
 
         $response->assertRedirect(route('crm.properties.index'))->assertSessionHasNoErrors();

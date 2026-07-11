@@ -7,7 +7,7 @@
         @include('components.seo', ['seo' => $seo])
     @else
         <title>@yield('title', 'Amra Property')</title>
-        <meta name="description" content="@yield('meta_description', 'Premium flats, villas and plots in Lucknow and Mumbai.')">
+        <meta name="description" content="@yield('meta_description', 'Verified flats, villas, plots and commercial properties across top cities.')">
     @endif
     
     <link rel="icon" type="image/png" href="{{ asset('assets/images/logo.png') }}">
@@ -169,7 +169,7 @@
                         Amra<span class="text-amra-primary">Property</span>
                     </a>
                     <p class="text-gray-400 max-w-sm leading-relaxed mb-8">
-                        Your trusted partner in finding the perfect home. RERA-approved projects and verified developers in Lucknow & Mumbai.
+                        Your trusted partner in finding verified homes, plots, and commercial spaces across leading property markets.
                     </p>
                     <div class="flex flex-wrap gap-4">
                         <a href="https://www.facebook.com/propertyamra" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-amra-primary hover:text-white transition-all duration-300" aria-label="Facebook">
@@ -208,10 +208,10 @@
                 <div>
                     <h3 class="text-white font-bold mb-6">Properties</h3>
                     <ul class="space-y-4 text-gray-400 text-sm">
-                        <li><a href="{{ route('site.property') }}" class="hover:text-amra-primary transition-colors">Flats in Mumbai</a></li>
-                        <li><a href="{{ route('site.property') }}" class="hover:text-amra-primary transition-colors">Villas in Lucknow</a></li>
-                        <li><a href="{{ route('site.property') }}" class="hover:text-amra-primary transition-colors">Commercial Plots</a></li>
-                        <li><a href="{{ route('site.property') }}" class="hover:text-amra-primary transition-colors">New Launches</a></li>
+                        <li><a href="{{ route('site.property', ['location' => 'Thane']) }}" class="hover:text-amra-primary transition-colors">Properties in Thane</a></li>
+                        <li><a href="{{ route('site.property', ['location' => 'Navi Mumbai']) }}" class="hover:text-amra-primary transition-colors">Properties in Navi Mumbai</a></li>
+                        <li><a href="{{ route('site.property', ['location' => 'Panvel']) }}" class="hover:text-amra-primary transition-colors">Properties in Panvel</a></li>
+                        <li><a href="{{ route('site.property', ['tag' => 'new-launch']) }}" class="hover:text-amra-primary transition-colors">New Launches</a></li>
                     </ul>
                 </div>
             </div>

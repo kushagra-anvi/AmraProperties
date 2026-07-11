@@ -56,8 +56,10 @@
                                 @if($enquiry->email)<div class="text-xs text-slate-500">{{ $enquiry->email }}</div>@endif
                             </td>
                             <td class="px-6 py-4">
-                                <div class="font-semibold text-slate-200 text-sm">{{ $enquiry->property?->title ?? 'Deleted property' }}</div>
-                                <div class="text-xs text-slate-500">{{ $enquiry->property?->city }}</div>
+                                <div class="font-semibold text-slate-200 text-sm">
+                                    {{ $enquiry->property?->title ?? ($enquiry->source === 'recommended_seller_contact' ? 'Seller contact request' : 'Deleted property') }}
+                                </div>
+                                <div class="text-xs text-slate-500">{{ $enquiry->property?->city ?? $enquiry->sellerPartner?->city }}</div>
                             </td>
                             <td class="px-6 py-4 text-xs text-slate-300">
                                 {{ $enquiry->partner?->company_name ?? $enquiry->sellerPartner?->company_name ?? 'Amra Concierge' }}

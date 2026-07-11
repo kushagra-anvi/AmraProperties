@@ -57,8 +57,13 @@ Route::get('/', function () {
         ->distinct()
         ->pluck('city')
         ->all();
+    $latestPosts = BlogPost::where('status', 'publish')
+        ->latest('published_at')
+        ->latest()
+        ->take(3)
+        ->get();
 
-    return view('site.home', compact('featuredProperties', 'recommendedSellers', 'seo', 'locations'));
+    return view('site.home', compact('featuredProperties', 'recommendedSellers', 'seo', 'locations', 'latestPosts'));
 })->name('site.home');
 
 Route::get('/about-us', function () {

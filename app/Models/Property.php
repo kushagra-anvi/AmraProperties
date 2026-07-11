@@ -85,6 +85,11 @@ class Property extends Model
         return $this->belongsToMany(Partner::class, 'partner_property');
     }
 
+    public function tags(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(PropertyTag::class, 'property_property_tag');
+    }
+
     /**
      * Get formatted price in INR.
      */

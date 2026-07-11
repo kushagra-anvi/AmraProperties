@@ -54,7 +54,7 @@
                     </div>
                     <h2 class="text-2xl sm:text-3xl font-serif font-bold text-amra-dark">Our Clear Mission</h2>
                     <p class="text-slate-500 leading-relaxed text-sm">
-                        Amra Property is established on a single core principle: to dissolve the friction, opacity, and stress of high-value real estate acquisitions. Whether matching prospective owners with elite Powai flats or exquisite villas in Lucknow, we prioritize genuine representation above all else.
+                        Amra Property is established on a single core principle: to dissolve the friction, opacity, and stress of high-value real estate acquisitions. Whether matching prospective owners with city apartments, villas, plots, or commercial spaces, we prioritize genuine representation above all else.
                     </p>
                     <p class="text-slate-500 leading-relaxed text-sm">
                         By working exclusively with India's tier-1 accredited builders—such as Lodha, Godrej, and Shalimar—we offer a guaranteed catalog of premium opportunities, vetted and validated for direct-to-owner placement.

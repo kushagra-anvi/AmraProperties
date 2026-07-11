@@ -11,7 +11,7 @@
         <div class="text-center mb-8 sm:mb-16">
             <p class="text-amra-primary font-bold uppercase tracking-[0.25em] text-[10px] sm:text-xs mb-2 sm:mb-3">Insights & News</p>
             <h1 class="text-2xl sm:text-3.5xl md:text-5xl font-serif font-bold text-amra-dark">Our <span class="text-amra-primary italic">Blog</span></h1>
-            <p class="text-gray-500 text-xs sm:text-sm mt-3">Real estate trends, guides, and updates from Lucknow & Mumbai.</p>
+            <p class="text-gray-500 text-xs sm:text-sm mt-3">Real estate trends, guides, and updates across leading property markets.</p>
         </div>
 
         <!-- Blog Grid -->

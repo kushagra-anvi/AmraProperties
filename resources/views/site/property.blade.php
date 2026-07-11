@@ -44,7 +44,7 @@
                         <select id="filter-listing-type" name="listing_type"
                             class="w-full bg-slate-50 border border-slate-100 text-slate-800 font-semibold rounded-xl px-4 py-3 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 transition-all cursor-pointer text-sm h-[46px]">
                             <option value="" {{ !request('listing_type') ? 'selected' : '' }}>Any Purpose</option>
-                            <option value="sale" {{ request('listing_type') === 'sale' ? 'selected' : '' }}>For Sale</option>
+                            <option value="sale" {{ request('listing_type') === 'sale' ? 'selected' : '' }}>Buy</option>
                             <option value="rent" {{ request('listing_type') === 'rent' ? 'selected' : '' }}>For Rent</option>
                         </select>
                     </div>
@@ -59,7 +59,7 @@
                             <option value="commercial" {{ request('type') === 'commercial' ? 'selected' : '' }}>Commercial / Office</option>
                         </select>
                     </div>
-                    <div class="w-full md:col-span-2">
+                    <div id="filter-budget-range" class="w-full md:col-span-2">
                         <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 pl-2 flex justify-between">
                             <span>Budget Range</span>
                             <span id="slider-budget-display" class="text-teal-600 font-bold">₹0 - ₹10 Cr+</span>
@@ -78,6 +78,10 @@
                         class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 px-6 py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-sm h-[46px]">
                         <i data-lucide="refresh-cw" class="w-4 h-4"></i> Reset
                     </a>
+                    <button type="submit"
+                        class="w-full md:col-span-6 bg-teal-500 hover:bg-teal-600 text-white px-6 py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-sm h-[46px] shadow-md">
+                        <i data-lucide="search" class="w-5 h-5 shrink-0"></i> Search
+                    </button>
                 </div>
             </form>
 
@@ -200,7 +204,7 @@
                         <div class="w-16 h-16 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center mb-4 mx-auto">
                             <i data-lucide="search-slash" class="w-8 h-8 text-amra-primary"></i>
                         </div>
-                        @if(request('q') || request('location') || request('type') || request('budget'))
+                        @if(request('q') || request('location') || request('type') || request('listing_type') || request('budget') || request('min_price') || request('max_price'))
                             <h3 class="text-xl font-serif font-bold text-amra-dark mb-2">No Matching Homes Found</h3>
                             <p class="text-gray-500 text-sm max-w-sm mb-6 mx-auto">Try adjusting your budget, location, or property type filters to find available premium listings.</p>
                             <a href="{{ route('site.property') }}" class="inline-block bg-teal-500 hover:bg-teal-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md active:scale-95">
@@ -287,6 +291,7 @@
     const maxPriceInput = document.getElementById('filter-max-price');
     const sliderBudgetDisplay = document.getElementById('slider-budget-display');
     const filterSliderTrack = document.getElementById('filter-slider-track');
+    const filterBudgetRange = document.getElementById('filter-budget-range');
 
     function formatPrice(val) {
         val = parseInt(val);
@@ -301,6 +306,8 @@
     }
 
     function updatePriceDisplay() {
+        if (!minPriceInput || !maxPriceInput || !sliderBudgetDisplay) return;
+
         let minVal = parseInt(minPriceInput.value);
         let maxVal = parseInt(maxPriceInput.value);
         
@@ -325,6 +332,15 @@
         }
     }
 
+    function syncBudgetVisibility() {
+        const isRent = filterListingType && filterListingType.value === 'rent';
+        if (!filterBudgetRange || !minPriceInput || !maxPriceInput) return;
+
+        filterBudgetRange.classList.toggle('hidden', isRent);
+        minPriceInput.disabled = isRent;
+        maxPriceInput.disabled = isRent;
+    }
+
     if (minPriceInput && maxPriceInput) {
         minPriceInput.addEventListener('input', () => {
             let minVal = parseInt(minPriceInput.value);
@@ -344,31 +360,78 @@
         });
         updatePriceDisplay();
         
-        minPriceInput.addEventListener('change', () => filterForm.submit());
-        maxPriceInput.addEventListener('change', () => filterForm.submit());
     }
 
-    if (filterLocation) filterLocation.addEventListener('change', () => filterForm.submit());
-    if (filterListingType) filterListingType.addEventListener('change', () => filterForm.submit());
-    if (filterType) filterType.addEventListener('change', () => filterForm.submit());
+    if (filterListingType) {
+        filterListingType.addEventListener('change', syncBudgetVisibility);
+    }
+
+    if (filterForm) {
+        filterForm.addEventListener('submit', () => {
+            syncBudgetVisibility();
+        });
+    }
+
+    syncBudgetVisibility();
+
+    function setFilterLocation(locationName) {
+        if (!filterLocation || !locationName) return;
+
+        const matchingOption = [...filterLocation.options].find((option) => (
+            option.value.toLowerCase() === locationName.toLowerCase()
+        ));
+
+        if (matchingOption) {
+            filterLocation.value = matchingOption.value;
+        }
+    }
+
+    const supportedMarkets = [
+        { name: 'Mumbai', lat: 19.076, lng: 72.8777, radiusKm: 35 },
+        { name: 'Thane', lat: 19.2183, lng: 72.9781, radiusKm: 25 },
+        { name: 'Navi Mumbai', lat: 19.033, lng: 73.0297, radiusKm: 28 },
+        { name: 'Panvel', lat: 18.9894, lng: 73.1175, radiusKm: 25 },
+        { name: 'Dombivli', lat: 19.2184, lng: 73.0867, radiusKm: 18 },
+        { name: 'Lucknow', lat: 26.8467, lng: 80.9462, radiusKm: 45 },
+        { name: 'Jaipur', lat: 26.9124, lng: 75.7873, radiusKm: 45 },
+        { name: 'Nashik', lat: 19.9975, lng: 73.7898, radiusKm: 35 },
+        { name: 'Varanasi', lat: 25.3176, lng: 82.9739, radiusKm: 35 },
+        { name: 'Dubai', lat: 25.2048, lng: 55.2708, radiusKm: 55 },
+    ];
+
+    function distanceKm(lat1, lng1, lat2, lng2) {
+        const earthRadiusKm = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLng = (lng2 - lng1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+            + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180)
+            * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        return earthRadiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    function nearestSupportedMarket(latitude, longitude) {
+        return supportedMarkets
+            .map((market) => ({
+                ...market,
+                distance: distanceKm(latitude, longitude, market.lat, market.lng),
+            }))
+            .filter((market) => market.distance <= market.radiusKm)
+            .sort((a, b) => a.distance - b.distance)[0] || null;
+    }
 
     const hasLocationFilter = new URLSearchParams(window.location.search).has('location');
     if (navigator.geolocation && !hasLocationFilter) {
         const savedLocation = localStorage.getItem('amra_location_detected');
         if (savedLocation) {
-            filterLocation.value = savedLocation;
-            filterForm.submit();
+            setFilterLocation(savedLocation);
         } else if (!localStorage.getItem('amra_location_prompted')) {
             localStorage.setItem('amra_location_prompted', '1');
             navigator.geolocation.getCurrentPosition((position) => {
                 const { latitude, longitude } = position.coords;
-                const location = latitude > 18 && latitude < 20 && longitude > 72 && longitude < 74 ? 'mumbai'
-                    : latitude > 25 && latitude < 28 && longitude > 79 && longitude < 82 ? 'lucknow'
-                    : '';
-                if (location) {
-                    localStorage.setItem('amra_location_detected', location);
-                    filterLocation.value = location;
-                    filterForm.submit();
+                const market = nearestSupportedMarket(latitude, longitude);
+                if (market) {
+                    localStorage.setItem('amra_location_detected', market.name);
+                    setFilterLocation(market.name);
                 }
             }, () => {
                 // Silently handle location block
@@ -428,26 +491,16 @@
     }
     renderCompareState();
 
-    // Debounce search query input to auto-submit form after 500ms of inactivity
+    // Support submitting immediately if user presses Enter.
     if (filterQuery) {
-        let debounceTimer;
-        filterQuery.addEventListener('input', () => {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => {
-                filterForm.submit();
-            }, 500);
-        });
-        
-        // Also support submitting immediately if user presses Enter
         filterQuery.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                clearTimeout(debounceTimer);
-                filterForm.submit();
+                filterForm.requestSubmit();
             }
         });
 
-        // Focus search query input and place cursor at the end for interactive flow
+        // Preserve cursor position when returning to an already searched query.
         const valLen = filterQuery.value.length;
         if (valLen > 0) {
             filterQuery.focus();
@@ -465,6 +518,15 @@
     const contactUnlocked = document.getElementById('contact-unlocked');
     const contactUnlockedPhone = document.getElementById('contact-unlocked-phone');
     const contactUnlockedWhatsapp = document.getElementById('contact-unlocked-whatsapp');
+    let contactRequestInFlight = false;
+
+    function setContactButtonsDisabled(disabled) {
+        document.querySelectorAll('.property-contact-trigger').forEach((button) => {
+            button.disabled = disabled;
+            button.classList.toggle('pointer-events-none', disabled);
+            button.classList.toggle('opacity-60', disabled);
+        });
+    }
 
     function closeContactModal() {
         contactModal.classList.add('hidden');
@@ -486,6 +548,8 @@
 
     document.querySelectorAll('.property-contact-trigger').forEach((button) => {
         button.addEventListener('click', () => {
+            if (contactRequestInFlight) return;
+
             contactAction.value = button.dataset.action || 'whatsapp';
             contactEndpoint.value = button.dataset.endpoint;
             contactTitle.textContent = button.dataset.propertyTitle || 'Get property details';
@@ -516,7 +580,10 @@
     if (contactForm) {
         contactForm.addEventListener('submit', (event) => {
             event.preventDefault();
+            if (contactRequestInFlight) return;
 
+            contactRequestInFlight = true;
+            setContactButtonsDisabled(true);
             contactSubmit.disabled = true;
             contactSubmit.textContent = 'Saving...';
 
@@ -566,6 +633,10 @@
                     contactSubmit.disabled = false;
                     contactSubmit.innerHTML = '<i data-lucide="send" class="h-4 w-4"></i> Save Enquiry & Show Contact';
                     if (window.lucide) window.lucide.createIcons();
+                })
+                .finally(() => {
+                    contactRequestInFlight = false;
+                    setContactButtonsDisabled(false);
                 });
         });
     }

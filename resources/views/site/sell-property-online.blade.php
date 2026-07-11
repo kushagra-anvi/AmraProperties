@@ -29,6 +29,11 @@
 @php
     $whatsappUrl = 'https://wa.me/919559992958?text=' . rawurlencode('Hi, I want to post my property ad on Amra Property.');
     $heroImage = 'https://www.amraproperty.com/wp-content/uploads/2026/02/Gemini_Generated_Image_ez4cd3ez4cd3ez4c-1-2.jpg';
+    $listingVisual = asset('wp-content/uploads/2023/12/Free-Property-Listing-web-2-1-1.webp');
+    $sellerVisual = asset('wp-content/uploads/2023/12/Free-Property-Listing-web-1-1-1.webp');
+    $whatsappVisual = asset('wp-content/uploads/2023/12/WhatsApp-Image-2023-12-01-at-1.16.12-PM-768x430.webp');
+    $freeListingBanner = asset('wp-content/uploads/2026/01/100-fREE-LISTING-1-1-768x243.png');
+    $ctaVisual = asset('assets/images/cta_key.png');
     $benefits = [
         '100% Free Property Listing',
         'Get Access to 4 Lakh+ Active Buyers',
@@ -58,11 +63,31 @@
         ['Premium Plan', '₹7999 / mo  ₹81600 / year', 'Unlimited basic listings', '2 featured listings', '2'],
     ];
     $faqItems = [
-        ['01. Can I sell property online for free?', 'Yes, you can sell your property online without any brokerage or additional charges. Just list your property on "Amra Property" to sell any type of property, such as a 2-3 BHK flat, plot, or row house. It\'s a very simple option to sell a house online; you just have to list your house on Amra Property. After listing your property online, you allow millions of potential buyers to see your property.'],
-        ['02. How does it work?', 'After filling out your property details online, we will verify the details and list your property on the Amra Property website. When any buyers show interest in your property, you will receive their details, including name and phone number, directly.'],
-        ['03. Is it safe to sell or list property online?', 'Yes, Amra Property ensures that all your details are completely safe. All leads regarding your property are also secure and will not be shared with anyone.'],
-        ['04. How can I get more inquiries about my property?', 'To get more and higher quality leads, please provide accurate property details. Write a full description that includes amenities, features, and nearby localities.'],
-        ['05. Will my property also be displayed on social media?', 'For social media promotion, you need to upgrade your listing. With the premium option, your property listing will also be advertised on social media.'],
+        [
+            'question' => '01. Can I sell property online for free?',
+            'answer' => 'Yes. You can list your property online without brokerage or additional charges.',
+            'points' => ['Works for flats, plots, row houses, and other property types', 'Basic listing on Amra Property is simple to start', 'Your listing can reach a large pool of potential buyers'],
+        ],
+        [
+            'question' => '02. How does it work?',
+            'answer' => 'Share your property details and our team verifies the listing before it goes live.',
+            'points' => ['Submit property details online or via WhatsApp', 'We verify the information and publish the listing', 'Interested buyers share their name and phone number directly'],
+        ],
+        [
+            'question' => '03. Is it safe to sell or list property online?',
+            'answer' => 'Yes. Your details and property enquiries are handled securely.',
+            'points' => ['Owner information is handled with care', 'Buyer leads are kept secure', 'Your enquiry data is not openly shared'],
+        ],
+        [
+            'question' => '04. How can I get more inquiries about my property?',
+            'answer' => 'Better details usually bring better quality leads.',
+            'points' => ['Add accurate location, area, and price information', 'Write a complete description with amenities and features', 'Use clear, real property images'],
+        ],
+        [
+            'question' => '05. Will my property also be displayed on social media?',
+            'answer' => 'Yes, social media promotion is available with upgraded listing plans.',
+            'points' => ['Premium promotion can include social channels', 'Campaigns help expand reach beyond organic listing views', 'Useful when you want faster and broader visibility'],
+        ],
     ];
 @endphp
 
@@ -125,11 +150,28 @@
     </section>
 
     <section class="pb-16">
-        <div class="mx-auto grid max-w-7xl gap-8 px-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
-            <div class="lg:sticky lg:top-28">
+        <div class="mx-auto grid max-w-7xl gap-8 px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+            <div>
                 <p class="mb-3 text-[11px] font-extrabold uppercase tracking-[0.28em] text-amra-primary">Sell Property Online</p>
                 <h2 class="text-3xl font-serif font-extrabold leading-tight text-slate-900 md:text-5xl">Sell Property Online in 3 Simple Steps</h2>
                 <p class="mt-4 text-sm leading-relaxed text-slate-500">Everything you need to sell faster, smarter & without brokerage</p>
+                <div class="mt-7 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+                    <img src="{{ $listingVisual }}" alt="Free property listing process" class="h-52 w-full object-cover sm:h-60">
+                    <div class="grid gap-2 border-t border-slate-100 bg-white p-3 sm:grid-cols-3">
+                        <div class="rounded-2xl bg-slate-50 p-3">
+                            <p class="font-serif text-lg font-extrabold text-slate-900">01</p>
+                            <p class="text-[9px] font-bold uppercase tracking-wider text-slate-500">Share Details</p>
+                        </div>
+                        <div class="rounded-2xl bg-slate-50 p-3">
+                            <p class="font-serif text-lg font-extrabold text-slate-900">02</p>
+                            <p class="text-[9px] font-bold uppercase tracking-wider text-slate-500">Verify Listing</p>
+                        </div>
+                        <div class="rounded-2xl bg-slate-50 p-3">
+                            <p class="font-serif text-lg font-extrabold text-slate-900">03</p>
+                            <p class="text-[9px] font-bold uppercase tracking-wider text-slate-500">Get Leads</p>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="grid gap-3 sm:grid-cols-2">
                 @foreach ($benefits as $point)
@@ -145,12 +187,15 @@
     </section>
 
     <section class="bg-white py-16">
-        <div class="mx-auto grid max-w-7xl gap-8 px-6 lg:grid-cols-3 lg:items-start">
+        <div class="mx-auto grid max-w-7xl gap-8 px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
             <div>
                 <p class="mb-3 text-[11px] font-extrabold uppercase tracking-[0.28em] text-amra-primary">Why Choose Us</p>
                 <h2 class="text-3xl font-serif font-extrabold leading-tight text-slate-900 md:text-4xl">Why Choose Amra Property to Sell Property Online</h2>
+                <div class="mt-7 overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-sm">
+                    <img src="{{ $sellerVisual }}" alt="Owner listing property online" class="h-72 w-full object-cover">
+                </div>
             </div>
-            <div class="grid gap-5 md:grid-cols-3 lg:col-span-2">
+            <div class="grid gap-5 md:grid-cols-3">
                 @foreach ([
                     ['Wide Exposure', 'We leverage the power of SEO to ensure your property gets maximum exposure across all your targeted locations and reaches genuine buyers.', 'search'],
                     ['Easy Listing Process', 'Listing your property is simple and hassle-free. Share your property details via WhatsApp or fill out our easy-to-use online form.', 'clipboard-list'],
@@ -239,24 +284,59 @@
 
     <section class="py-16">
         <div class="mx-auto grid max-w-7xl gap-8 px-6 lg:grid-cols-[0.85fr_1.15fr]">
-            <div class="rounded-3xl bg-slate-900 p-8 text-white md:p-10">
-                <p class="mb-3 text-[11px] font-extrabold uppercase tracking-[0.28em] text-amra-primary">List Your Property</p>
-                <h2 class="text-3xl font-serif font-extrabold leading-tight">Unlock Your Property's Potential with AMRA Property!</h2>
-                <p class="mt-4 text-sm leading-relaxed text-slate-300">So why wait? Experience the convenience and efficiency of selling your property online with Amra Property.</p>
-                <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-amra-primary px-6 py-3.5 text-sm font-extrabold text-slate-950 transition-all hover:bg-teal-300">List Your Property</a>
+            <div class="overflow-hidden rounded-3xl bg-slate-900 text-white shadow-sm">
+                <div class="p-8 md:p-10">
+                    <p class="mb-3 text-[11px] font-extrabold uppercase tracking-[0.28em] text-amra-primary">List Your Property</p>
+                    <h2 class="text-3xl font-serif font-extrabold leading-tight">Unlock Your Property's Potential with AMRA Property!</h2>
+                    <p class="mt-4 text-sm leading-relaxed text-slate-300">So why wait? Experience the convenience and efficiency of selling your property online with Amra Property.</p>
+                    <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-amra-primary px-6 py-3.5 text-sm font-extrabold text-slate-950 transition-all hover:bg-teal-300">List Your Property</a>
+                </div>
+                <img src="{{ $ctaVisual }}" alt="Property owner listing with Amra Property" class="h-64 w-full object-cover object-center">
             </div>
-            <article class="prose prose-slate max-w-none rounded-3xl border border-slate-200 bg-white p-8 shadow-sm prose-a:font-bold prose-a:text-amra-primary md:p-10">
-                <p>Are you property owner & looking to sell property online without paying expensive fee? Look no further than Amra Property. <a href="{{ route('site.home') }}">Amra Property</a> is a trusted partner in online property sales. With us anyone sell property online very easily.</p>
-                <p><strong>Wide Exposure:</strong> Worried about your property getting lost in the vast sea of real estate listings? Fret not! At Amra Property, we leverage the power of SEO to ensure that your property gets maximum exposure across all your targeted locations.</p>
-                <p><strong>Easy Listing Process:</strong> With Amra Property, listing your property is as easy as pie. Simply share your property details with us via <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer">WhatsApp</a> or fill out our user-friendly forms.</p>
-                <p><strong>Marketing & Promotion:</strong> We understand the importance of effective marketing in selling your property quickly and at the best price. That’s why we go the extra mile to promote your property through targeted campaigns on Google and social media platforms( <a href="https://www.facebook.com/propertyamra" target="_blank" rel="noopener noreferrer">Facebook</a> , <a href="https://www.instagram.com/amra_property/" target="_blank" rel="noopener noreferrer">Instagram</a> and <a href="https://twitter.com/AmraProperty" target="_blank" rel="noopener noreferrer">Twitter</a> ).</p>
-                <p>Join our growing community of satisfied sellers and let us help you make your property sale a resounding success!</p>
+            <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+                <div class="mb-6 border-b border-slate-100 pb-6">
+                    <p class="mb-3 text-[11px] font-extrabold uppercase tracking-[0.24em] text-amra-primary">Why sellers use Amra</p>
+                    <h2 class="max-w-2xl text-2xl font-serif font-extrabold leading-tight text-slate-900 md:text-3xl">Sell property online without expensive fees or complicated steps.</h2>
+                    <p class="mt-3 text-sm leading-relaxed text-slate-500">
+                        Amra Property helps owners list their property, reach genuine buyers, and manage enquiries with a simpler online process.
+                    </p>
+                </div>
+
+                <div class="grid gap-3">
+                    @foreach ([
+                        ['Trusted online sales partner', 'Look no further than Amra Property. With us anyone sell property online very easily.', 'shield-check'],
+                        ['Wide exposure', 'We leverage SEO so your property gets maximum exposure across all your targeted locations.', 'search'],
+                        ['Easy listing process', 'Share your property details via WhatsApp or fill out our user-friendly forms.', 'clipboard-list'],
+                        ['Marketing & promotion', 'We promote your property through targeted campaigns on Google, Facebook, Instagram, and Twitter.', 'megaphone'],
+                    ] as $item)
+                        <div class="flex gap-4 rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-amra-primary shadow-sm">
+                                <i data-lucide="{{ $item[2] }}" class="h-5 w-5"></i>
+                            </span>
+                            <div>
+                                <h3 class="font-serif text-base font-extrabold text-slate-900">{{ $item[0] }}</h3>
+                                <p class="mt-1 text-sm leading-relaxed text-slate-500">{{ $item[1] }}</p>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <div class="mt-6 flex flex-col gap-3 rounded-2xl bg-teal-50 p-5 sm:flex-row sm:items-center sm:justify-between">
+                    <p class="text-sm font-semibold leading-relaxed text-slate-700">Join our growing community of satisfied sellers and let us help you make your property sale a resounding success.</p>
+                    <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-amra-primary px-5 py-3 text-xs font-extrabold text-slate-950 hover:bg-teal-300">
+                        <i data-lucide="send" class="h-4 w-4"></i>
+                        Start Listing
+                    </a>
+                </div>
             </article>
         </div>
     </section>
 
     <section class="bg-white py-16">
         <div class="mx-auto max-w-7xl px-6">
+            <div class="mb-8 overflow-hidden rounded-3xl border border-teal-100 bg-teal-50 shadow-sm">
+                <img src="{{ $freeListingBanner }}" alt="100 percent free listing on Amra Property" class="h-auto w-full object-cover">
+            </div>
             <div class="grid gap-5 md:grid-cols-3">
                 @foreach ([
                     ['01', 'By clicking on "List Your Property Online," a form will pop up.'],
@@ -275,21 +355,27 @@
     <section class="py-16">
         <div class="mx-auto max-w-7xl px-6">
             <div class="grid gap-6 lg:grid-cols-2">
-                <article class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-                    <h2 class="mb-2 text-2xl font-serif font-extrabold text-slate-900">Sell Property online with 3 simple steps</h2>
-                    <h3 class="mb-6 text-base font-bold text-slate-700">Tips to Get Higher and Quality Leads for Your Property</h3>
-                    <div class="grid gap-5 md:grid-cols-3 lg:grid-cols-1">
-                        <div><h4 class="mb-2 font-bold text-slate-900">Provide Proper Details:</h4><p class="text-sm text-slate-500">Include all relevant information about the property, such as the project name, location, nearby landmarks, area, and price.</p></div>
-                        <div><h4 class="mb-2 font-bold text-slate-900">Good Quality Images:</h4><p class="text-sm text-slate-500">Use high-quality and real images to attract potential buyers.</p></div>
-                        <div><h4 class="mb-2 font-bold text-slate-900">Locality:</h4><p class="text-sm text-slate-500">Provide accurate details about the locality, including amenities and surrounding areas.</p></div>
+                <article class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+                    <img src="{{ $whatsappVisual }}" alt="Share property details on WhatsApp" class="h-56 w-full object-cover">
+                    <div class="p-8">
+                        <h2 class="mb-2 text-2xl font-serif font-extrabold text-slate-900">Sell Property online with 3 simple steps</h2>
+                        <h3 class="mb-6 text-base font-bold text-slate-700">Tips to Get Higher and Quality Leads for Your Property</h3>
+                        <div class="grid gap-5 md:grid-cols-3 lg:grid-cols-1">
+                            <div><h4 class="mb-2 font-bold text-slate-900">Provide Proper Details:</h4><p class="text-sm text-slate-500">Include all relevant information about the property, such as the project name, location, nearby landmarks, area, and price.</p></div>
+                            <div><h4 class="mb-2 font-bold text-slate-900">Good Quality Images:</h4><p class="text-sm text-slate-500">Use high-quality and real images to attract potential buyers.</p></div>
+                            <div><h4 class="mb-2 font-bold text-slate-900">Locality:</h4><p class="text-sm text-slate-500">Provide accurate details about the locality, including amenities and surrounding areas.</p></div>
+                        </div>
                     </div>
                 </article>
-                <article class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-                    <h2 class="mb-6 text-2xl font-serif font-extrabold text-slate-900">Benefits of Listing Property Online</h2>
-                    <div class="grid gap-5 md:grid-cols-3 lg:grid-cols-1">
-                        <div><h3 class="mb-2 font-bold text-slate-900">Better Exposure:</h3><p class="text-sm text-slate-500">Gain greater visibility by showcasing your property to potential buyers. Nowadays, people often search for properties online.</p></div>
-                        <div><h3 class="mb-2 font-bold text-slate-900">Affordability:</h3><p class="text-sm text-slate-500">Selling property online is much cheaper than traditional methods, allowing you to reach a large number of customers at a lower cost.</p></div>
-                        <div><h3 class="mb-2 font-bold text-slate-900">Time-Saving:</h3><p class="text-sm text-slate-500">Online promotions enable you to reach a large number of buyers quickly and efficiently.</p></div>
+                <article class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+                    <img src="{{ $listingVisual }}" alt="Property listing benefits" class="h-56 w-full object-cover">
+                    <div class="p-8">
+                        <h2 class="mb-6 text-2xl font-serif font-extrabold text-slate-900">Benefits of Listing Property Online</h2>
+                        <div class="grid gap-5 md:grid-cols-3 lg:grid-cols-1">
+                            <div><h3 class="mb-2 font-bold text-slate-900">Better Exposure:</h3><p class="text-sm text-slate-500">Gain greater visibility by showcasing your property to potential buyers. Nowadays, people often search for properties online.</p></div>
+                            <div><h3 class="mb-2 font-bold text-slate-900">Affordability:</h3><p class="text-sm text-slate-500">Selling property online is much cheaper than traditional methods, allowing you to reach a large number of customers at a lower cost.</p></div>
+                            <div><h3 class="mb-2 font-bold text-slate-900">Time-Saving:</h3><p class="text-sm text-slate-500">Online promotions enable you to reach a large number of buyers quickly and efficiently.</p></div>
+                        </div>
                     </div>
                 </article>
             </div>
@@ -304,32 +390,41 @@
             </div>
             <div class="grid gap-6 md:grid-cols-3">
                 <!-- Card 1: Lucknow Overview -->
-                <div class="rounded-3xl border border-slate-200 bg-slate-50 p-8 shadow-sm">
+                <div class="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-sm">
+                    <img src="{{ asset('assets/images/prop1.webp') }}" alt="Lucknow property overview" class="h-44 w-full object-cover">
+                    <div class="p-8">
                     <h3 class="mb-4 font-serif text-xl font-extrabold text-slate-900 leading-snug">Sell Property Online Easily & Faster With Amra Property</h3>
                     <h4 class="mb-4 text-xs font-bold uppercase tracking-wider text-slate-400">Best Property in Lucknow for sale</h4>
                     <div class="space-y-4 text-sm leading-relaxed text-slate-500">
                         <p>Are you looking to rent or buy a <a href="{{ route('site.property', ['location' => 'lucknow']) }}" class="font-bold text-amra-primary hover:underline">properties in Lucknow</a> ? <a href="{{ route('site.home') }}" class="font-bold text-amra-primary hover:underline">Amra Property</a> can help you find the perfect place to call home. With a wide range of options available, you are sure to find something that suits your preferences and budget.</p>
                         <p>If you are interested in purchasing a <a href="{{ route('site.property', ['location' => 'lucknow']) }}" class="font-bold text-amra-primary hover:underline">house for sale in Lucknow</a> , Amra Property has several options available. We have both new and old houses for sale in various localities of the city. From spacious independent houses to cozy row houses, we have something to cater to all your needs. Additionally, we also have <a href="{{ route('site.property', ['location' => 'lucknow', 'type' => 'villa']) }}" class="font-bold text-amra-primary hover:underline">villas for sale in Lucknow</a> that offer luxurious living with ample space and amenities.</p>
                     </div>
+                    </div>
                 </div>
 
                 <!-- Card 2: Lucknow Flats & Plots -->
-                <div class="rounded-3xl border border-slate-200 bg-slate-50 p-8 shadow-sm">
+                <div class="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-sm">
+                    <img src="{{ asset('assets/images/prop2.jpeg') }}" alt="Flats and plots listing" class="h-44 w-full object-cover">
+                    <div class="p-8">
                     <h3 class="mb-4 font-serif text-xl font-extrabold text-slate-900 leading-snug">Amra Property - Buy house for sale in Lucknow</h3>
                     <h4 class="mb-4 text-xs font-bold uppercase tracking-wider text-slate-400">Flats & Plots in Lucknow</h4>
                     <div class="space-y-4 text-sm leading-relaxed text-slate-500">
                         <p>For those looking for flats, we have both <a href="{{ route('site.property', ['q' => '2BHK Lucknow']) }}" class="font-bold text-amra-primary hover:underline">2 BHK</a> and <a href="{{ route('site.property', ['q' => '3BHK Lucknow']) }}" class="font-bold text-amra-primary hover:underline">3 BHK flats in Lucknow</a> . Whether you are a small family or a large one, we have flats that cater to all your requirements. If you are interested in renting, we also have <a href="{{ route('site.property', ['q' => '2BHK Lucknow']) }}" class="font-bold text-amra-primary hover:underline">2 BHK flats in Lucknow</a> available for rent.</p>
                         <p>If you are looking for a plot of land to build your dream home, we have you covered. We have LDA approved plots in Lucknow in various sizes and locations. Our team of experts can help you choose the perfect plot that suits your needs and budget.</p>
                     </div>
+                    </div>
                 </div>
 
                 <!-- Card 3: Mumbai & Market Context -->
-                <div class="rounded-3xl border border-slate-200 bg-slate-50 p-8 shadow-sm">
+                <div class="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-sm">
+                    <img src="{{ asset('assets/images/prop3.png') }}" alt="Mumbai property market" class="h-44 w-full object-cover">
+                    <div class="p-8">
                     <h3 class="mb-4 font-serif text-xl font-extrabold text-slate-900 leading-snug">Flat in Mumbai - Amra Property</h3>
                     <h4 class="mb-4 text-xs font-bold uppercase tracking-wider text-slate-400">Mumbai Properties & Market Context</h4>
                     <div class="space-y-4 text-sm leading-relaxed text-slate-500">
                         <p>One of the most sought-after property types in Mumbai is the flat, and Amra Property specializes in helping you find your ideal flat in this dynamic city. Whether you're looking for a cozy 1BHK flat in mumbai or a more spacious 2BHK flat in mumbai, our extensive listings cater to a wide range of preferences and budgets.</p>
                         <p>At Amra Property, we understand the importance of finding the perfect home. We strive to provide our clients with the best real estate solutions that meet their requirements. With our in-depth knowledge of the <a href="{{ route('site.home') }}" class="font-bold text-amra-primary hover:underline">Lucknow real estate</a> market, we can provide you with accurate information on Lucknow <a href="{{ route('site.property', ['location' => 'lucknow', 'type' => 'plot']) }}" class="font-bold text-amra-primary hover:underline">plot</a> rates, flat prices, and more.</p>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -344,12 +439,24 @@
             </div>
             <div class="space-y-4">
                 @foreach ($faqItems as $faq)
-                    <details class="group rounded-2xl border border-slate-200 bg-white p-5" @if($loop->first) open @endif>
+                    <details class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm" @if($loop->first) open @endif>
                         <summary class="flex cursor-pointer items-center justify-between gap-4 font-serif font-extrabold text-slate-900">
-                            {{ $faq[0] }}
+                            {{ $faq['question'] }}
                             <i data-lucide="chevron-down" class="h-4 w-4 text-slate-400 transition-transform group-open:rotate-180"></i>
                         </summary>
-                        <p class="mt-3 text-sm leading-relaxed text-slate-500">{{ $faq[1] }}</p>
+                        <div class="mt-4 border-t border-slate-100 pt-4">
+                            <p class="text-sm font-semibold leading-relaxed text-slate-700">{{ $faq['answer'] }}</p>
+                            <div class="mt-4 grid gap-2">
+                                @foreach($faq['points'] as $point)
+                                    <div class="flex gap-3 rounded-xl bg-slate-50 p-3">
+                                        <span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-teal-50 text-amra-primary">
+                                            <i data-lucide="check" class="h-3 w-3"></i>
+                                        </span>
+                                        <p class="text-sm leading-relaxed text-slate-500">{{ $point }}</p>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
                     </details>
                 @endforeach
             </div>

@@ -90,8 +90,12 @@
 
                     <div class="space-y-1.5">
                         <label for="possession_status" class="text-xs font-bold text-slate-400">Possession Status</label>
-                        <input id="possession_status" name="possession_status" type="text" value="{{ old('possession_status') }}" placeholder="e.g. Ready to Move"
-                            class="w-full bg-slate-950 border border-slate-800 focus:border-amra-primary rounded-xl px-4 py-3 outline-none text-sm text-slate-250 placeholder-slate-650">
+                        <select id="possession_status" name="possession_status"
+                            class="w-full bg-slate-950 border border-slate-800 focus:border-amra-primary rounded-xl px-4 py-3 outline-none text-sm text-slate-250">
+                            <option value="" {{ old('possession_status') ? '' : 'selected' }}>Select possession status</option>
+                            <option value="Ready to Move" {{ old('possession_status') === 'Ready to Move' ? 'selected' : '' }}>Ready to Move</option>
+                            <option value="Under Construction" {{ old('possession_status') === 'Under Construction' ? 'selected' : '' }}>Under Construction</option>
+                        </select>
                     </div>
 
                     <!-- Configuration -->
@@ -170,6 +174,26 @@
                         </div>
                     </div>
 
+                    <div class="space-y-1.5 md:col-span-2">
+                        <label class="text-xs font-bold text-slate-400 block mb-2">Property Tags</label>
+                        <div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+                            @foreach (($tags ?? collect()) as $tag)
+                                <label class="flex items-center gap-2 rounded-lg border border-slate-850 p-3 text-xs text-slate-200 cursor-pointer hover:bg-slate-850/20 transition-colors">
+                                    <input type="checkbox" name="tag_ids[]" value="{{ $tag->id }}"
+                                        class="rounded bg-slate-950 border-slate-800 text-teal-500 focus:ring-teal-500/20"
+                                        {{ is_array(old('tag_ids')) && in_array($tag->id, old('tag_ids')) ? 'checked' : '' }}>
+                                    {{ $tag->name }}
+                                </label>
+                            @endforeach
+                        </div>
+                        <div class="mt-4">
+                            <label for="custom_tags" class="text-xs font-bold text-slate-400 block mb-1.5">Custom Tags</label>
+                            <input id="custom_tags" name="custom_tags" type="text" value="{{ old('custom_tags') }}" placeholder="e.g. Sea View, Corner Plot, Near Airport"
+                                class="w-full bg-slate-950 border border-slate-800 focus:border-amra-primary rounded-xl px-4 py-3 outline-none text-sm text-slate-250 placeholder-slate-650">
+                            <p class="mt-1.5 text-[10px] text-slate-500">Separate tags with commas. New tags will be saved automatically.</p>
+                        </div>
+                    </div>
+
                     <div class="space-y-1.5">
                         <label for="contact_phone" class="text-xs font-bold text-slate-400">Contact Phone</label>
                         <input id="contact_phone" name="contact_phone" type="text" value="{{ old('contact_phone') }}" placeholder="+91 9559992958"
@@ -192,10 +216,20 @@
                     <!-- City -->
                     <div class="space-y-1.5">
                         <label for="city" class="text-xs font-bold text-slate-400">City <span class="text-rose-500">*</span></label>
-                        <select id="city" name="city" required class="w-full bg-slate-950 border border-slate-800 focus:border-amra-primary rounded-xl px-4 py-3 outline-none text-sm text-slate-250">
-                            <option value="Mumbai" {{ old('city') === 'Mumbai' ? 'selected' : '' }}>Mumbai</option>
-                            <option value="Lucknow" {{ old('city') === 'Lucknow' ? 'selected' : '' }}>Lucknow</option>
-                        </select>
+                        <input id="city" name="city" type="text" list="property-city-options" required value="{{ old('city') }}" placeholder="e.g. Thane, Navi Mumbai, Lucknow"
+                            class="w-full bg-slate-950 border border-slate-800 focus:border-amra-primary rounded-xl px-4 py-3 outline-none text-sm text-slate-250 placeholder-slate-650">
+                        <datalist id="property-city-options">
+                            <option value="Mumbai">
+                            <option value="Navi Mumbai">
+                            <option value="Thane">
+                            <option value="Panvel">
+                            <option value="Dombivli">
+                            <option value="Lucknow">
+                            <option value="Jaipur">
+                            <option value="Dubai">
+                            <option value="Nashik">
+                            <option value="Varanasi">
+                        </datalist>
                     </div>
 
                     <!-- State -->

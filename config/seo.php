@@ -19,8 +19,8 @@ return [
 
     'static' => [
         'home' => [
-            'title' => 'Amra Property - Real Estate in Lucknow & Mumbai',
-            'description' => 'Buy property for sale in Lucknow & Mumbai with Amra Property. Book Flats, Villas, Row Houses or any type of property at the best price with easy EMI.',
+            'title' => 'Amra Property - Real Estate Across Top Cities',
+            'description' => 'Buy and rent verified properties across Mumbai, Thane, Navi Mumbai, Panvel, Lucknow, Jaipur, Dubai and more with Amra Property.',
         ],
         'about' => [
             'title' => 'About Us - Amra Property',
@@ -28,7 +28,7 @@ return [
         ],
         'contact' => [
             'title' => 'Contact Us - Amra Property',
-            'description' => 'Get in touch with Amra Property. Contact our agents for premium Powai flats and Lucknow villas.',
+            'description' => 'Get in touch with Amra Property. Contact our team for verified flats, villas, plots and commercial properties across top cities.',
         ],
         'sell-property-online' => [
             'title' => 'Sell property online | Free property listing & Advertise flat, Plot etc',

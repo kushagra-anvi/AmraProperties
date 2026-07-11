@@ -6,6 +6,7 @@ use App\Models\Property;
 use App\Models\Partner;
 use App\Support\SeoMeta;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class PropertyController extends Controller
@@ -18,14 +19,18 @@ class PropertyController extends Controller
         $query = Property::with('configurations')->where('status', 'publish');
 
         // Search query filtering
-        if ($q = $request->input('q')) {
+        if ($q = trim((string) $request->input('q', ''))) {
             $query->where(function($sub) use ($q) {
                 $sub->where('title', 'like', '%' . $q . '%')
                     ->orWhere('description', 'like', '%' . $q . '%')
                     ->orWhere('developer_name', 'like', '%' . $q . '%')
                     ->orWhere('address', 'like', '%' . $q . '%')
                     ->orWhere('city', 'like', '%' . $q . '%')
-                    ->orWhere('configuration', 'like', '%' . $q . '%');
+                    ->orWhere('configuration', 'like', '%' . $q . '%')
+                    ->orWhereHas('tags', function ($tagQuery) use ($q) {
+                        $tagQuery->where('name', 'like', '%' . $q . '%')
+                            ->orWhere('slug', 'like', '%' . Str::slug($q) . '%');
+                    });
 
                 // Extract BHK query numbers (e.g. 2 BHK)
                 if (preg_match_all('/(\d+)\s*bhk/i', $q, $matches)) {
@@ -37,8 +42,14 @@ class PropertyController extends Controller
             });
         }
 
+        if ($tag = trim((string) $request->input('tag', ''))) {
+            $query->whereHas('tags', function ($tagQuery) use ($tag) {
+                $tagQuery->where('slug', Str::slug($tag));
+            });
+        }
+
         // Location filtering (dynamic city check)
-        if ($location = strtolower($request->input('location') ?? '')) {
+        if ($location = Str::lower(trim((string) $request->input('location', '')))) {
             if ($location === 'mumbai') {
                 $query->where(function($sub) {
                     $mumbaiCities = ['mumbai', 'thane', 'navi mumbai', 'panvel', 'dombivli', 'chembur', 'prabhadevi', 'versova', 'airoli', 'kharghar', 'kolshet', 'kapurbawdi'];
@@ -59,7 +70,8 @@ class PropertyController extends Controller
         }
 
         // Rent / Sale filtering
-        if ($listingType = $request->input('listing_type')) {
+        $listingType = $request->input('listing_type');
+        if ($listingType) {
             if (in_array($listingType, ['sale', 'rent'])) {
                 $query->where('listing_type', $listingType);
             }
@@ -119,16 +131,19 @@ class PropertyController extends Controller
         }
 
         // Slider-based Price range filtering
-        if ($request->filled('min_price') || $request->filled('max_price')) {
+        if ($listingType !== 'rent' && ($request->filled('min_price') || $request->filled('max_price'))) {
             $minPrice = (int) $request->input('min_price', 0);
             $maxPrice = (int) $request->input('max_price', 9999999999);
+            if ($minPrice > $maxPrice) {
+                [$minPrice, $maxPrice] = [$maxPrice, $minPrice];
+            }
             $query->where(function ($sub) use ($minPrice, $maxPrice) {
                 $sub->whereBetween('price', [$minPrice, $maxPrice])
                     ->orWhereHas('configurations', function ($subConfig) use ($minPrice, $maxPrice) {
                         $subConfig->whereBetween('price', [$minPrice, $maxPrice]);
                     });
             });
-        } elseif ($request->filled('budget')) {
+        } elseif ($listingType !== 'rent' && $request->filled('budget')) {
             // Backward-compatible fallback for legacy budget queries
             $budget = $request->input('budget');
             $minPrice = 0;

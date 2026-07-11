@@ -13,7 +13,7 @@ class SeoMeta
     {
         $page = config("seo.static.{$key}", []);
         $title = $page['title'] ?? config('seo.site_name');
-        $description = $page['description'] ?? 'Premium flats, villas and plots in Lucknow and Mumbai.';
+        $description = $page['description'] ?? 'Verified flats, villas, plots and commercial properties across top cities.';
         $image = $page['image'] ?? config('seo.default_image');
 
         return self::make([
@@ -43,7 +43,7 @@ class SeoMeta
         $title = implode(' ', $parts) . ' - Amra Property';
         $description = $location
             ? "Explore verified properties in {$location} with Amra Property. Compare flats, villas, plots, prices, amenities and possession details."
-            : 'View verified properties by Amra Property. Compare flats, villas, plots, prices, amenities and possession details in Lucknow and Mumbai.';
+            : 'View verified properties by Amra Property. Compare flats, villas, plots, prices, amenities and possession details across top cities.';
 
         return self::make([
             'title' => $title,
@@ -135,7 +135,7 @@ class SeoMeta
     {
         return array_merge([
             'title' => config('seo.site_name'),
-            'description' => 'Premium flats, villas and plots in Lucknow and Mumbai.',
+            'description' => 'Verified flats, villas, plots and commercial properties across top cities.',
             'canonical' => url()->current(),
             'robots' => config('seo.robots'),
             'locale' => config('seo.locale'),
@@ -295,7 +295,7 @@ class SeoMeta
             '@id' => self::siteUrl('/#website'),
             'url' => self::siteUrl('/'),
             'name' => config('seo.site_name'),
-            'description' => 'Buy Property in Lucknow and Mumbai',
+            'description' => 'Buy and rent verified properties across top cities',
             'publisher' => ['@id' => self::siteUrl('/#organization')],
             'potentialAction' => [[
                 '@type' => 'SearchAction',

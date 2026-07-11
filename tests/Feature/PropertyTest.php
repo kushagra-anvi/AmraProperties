@@ -3,6 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\Property;
+use App\Models\PropertyTag;
+use App\Models\Partner;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -163,6 +166,198 @@ class PropertyTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Mumbai Luxury Flat');
         $response->assertDontSee('Lucknow Premium Plot');
+    }
+
+    public function test_property_search_can_match_and_filter_by_tags(): void
+    {
+        $nearMetro = PropertyTag::where('slug', 'near-metro')->firstOrFail();
+        $premiumBuilder = PropertyTag::where('slug', 'premium-builder')->firstOrFail();
+
+        $taggedProperty = Property::create([
+            'title' => 'Central Heights',
+            'slug' => 'central-heights',
+            'description' => 'A well connected apartment.',
+            'price' => 9000000,
+            'city' => 'Mumbai',
+            'status' => 'publish',
+            'configuration' => '2BHK',
+        ]);
+        $taggedProperty->tags()->attach($nearMetro);
+
+        $otherProperty = Property::create([
+            'title' => 'Garden Estate',
+            'slug' => 'garden-estate',
+            'description' => 'A quiet apartment community.',
+            'price' => 8500000,
+            'city' => 'Mumbai',
+            'status' => 'publish',
+            'configuration' => '2BHK',
+        ]);
+        $otherProperty->tags()->attach($premiumBuilder);
+
+        $this->get('/property?q=near metro')
+            ->assertStatus(200)
+            ->assertSee('Central Heights')
+            ->assertDontSee('Garden Estate');
+
+        $this->get('/property?tag=near-metro')
+            ->assertStatus(200)
+            ->assertSee('Central Heights')
+            ->assertDontSee('Garden Estate');
+    }
+
+    public function test_sale_price_filter_handles_reversed_ranges(): void
+    {
+        Property::create([
+            'title' => 'Affordable Sale Home',
+            'slug' => 'affordable-sale-home',
+            'description' => 'Sale property inside the selected budget.',
+            'price' => 5000000,
+            'city' => 'Mumbai',
+            'status' => 'publish',
+            'listing_type' => 'sale',
+            'configuration' => '2BHK Flat',
+        ]);
+
+        Property::create([
+            'title' => 'Premium Sale Home',
+            'slug' => 'premium-sale-home',
+            'description' => 'Sale property outside the selected budget.',
+            'price' => 15000000,
+            'city' => 'Mumbai',
+            'status' => 'publish',
+            'listing_type' => 'sale',
+            'configuration' => '3BHK Flat',
+        ]);
+
+        $this->get('/property?listing_type=sale&min_price=8000000&max_price=3000000')
+            ->assertStatus(200)
+            ->assertSee('Affordable Sale Home')
+            ->assertDontSee('Premium Sale Home');
+    }
+
+    public function test_rent_search_ignores_budget_ranges(): void
+    {
+        Property::create([
+            'title' => 'Low Rent Apartment',
+            'slug' => 'low-rent-apartment',
+            'description' => 'A rental below the provided sale budget.',
+            'price' => 30000,
+            'city' => 'Mumbai',
+            'status' => 'publish',
+            'listing_type' => 'rent',
+            'configuration' => '1BHK Flat',
+        ]);
+
+        Property::create([
+            'title' => 'High Rent Apartment',
+            'slug' => 'high-rent-apartment',
+            'description' => 'A rental above the provided sale budget.',
+            'price' => 250000,
+            'city' => 'Mumbai',
+            'status' => 'publish',
+            'listing_type' => 'rent',
+            'configuration' => '3BHK Flat',
+        ]);
+
+        $this->get('/property?listing_type=rent&min_price=100000&max_price=150000')
+            ->assertStatus(200)
+            ->assertSee('Low Rent Apartment')
+            ->assertSee('High Rent Apartment');
+    }
+
+    public function test_admin_can_create_custom_tags_while_creating_property(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $existingTag = PropertyTag::where('slug', 'luxury')->firstOrFail();
+
+        $response = $this->actingAs($admin)->post(route('crm.properties.store'), [
+            'title' => 'Airport View Residence',
+            'price' => 9500000,
+            'area_unit' => 'sq_ft',
+            'configuration' => '2BHK',
+            'city' => 'Navi Mumbai',
+            'status' => 'publish',
+            'listing_type' => 'sale',
+            'tag_ids' => [$existingTag->id],
+            'custom_tags' => 'Sea View, Near Airport',
+        ]);
+
+        $response->assertRedirect(route('crm.properties.index'));
+
+        $property = Property::where('title', 'Airport View Residence')->firstOrFail();
+
+        $this->assertDatabaseHas('property_tags', [
+            'name' => 'Sea View',
+            'slug' => 'sea-view',
+            'is_active' => true,
+        ]);
+        $this->assertDatabaseHas('property_tags', [
+            'name' => 'Near Airport',
+            'slug' => 'near-airport',
+            'is_active' => true,
+        ]);
+
+        $this->assertTrue($property->tags()->where('slug', 'luxury')->exists());
+        $this->assertTrue($property->tags()->where('slug', 'sea-view')->exists());
+        $this->assertTrue($property->tags()->where('slug', 'near-airport')->exists());
+    }
+
+    public function test_recommended_seller_contact_creates_property_enquiry_and_shared_lead(): void
+    {
+        $partner = Partner::create([
+            'type' => 'agent',
+            'company_name' => 'Trusted Seller Realty',
+            'contact_person' => 'Amit Seller',
+            'phone' => '+91 90000 11111',
+            'city' => 'Thane',
+            'service_areas' => ['Thane', 'Mulund'],
+            'package' => 'starter',
+            'is_active' => true,
+        ]);
+
+        $response = $this->postJson(route('site.recommended-seller.contact', $partner), [
+            'name' => 'Repeat Buyer',
+            'phone' => '9876543210',
+            'email' => 'repeat@example.com',
+            'intent' => 'seller_contact',
+            'message' => 'Please connect me with this seller.',
+        ]);
+
+        $response->assertOk()
+            ->assertJson([
+                'success' => true,
+                'phone' => '+91 90000 11111',
+            ])
+            ->assertJsonStructure(['enquiry_id', 'lead_id', 'whatsapp_url']);
+
+        $enquiryId = $response->json('enquiry_id');
+        $leadId = $response->json('lead_id');
+
+        $this->assertDatabaseHas('property_enquiries', [
+            'id' => $enquiryId,
+            'property_id' => null,
+            'partner_id' => $partner->id,
+            'seller_partner_id' => $partner->id,
+            'name' => 'Repeat Buyer',
+            'phone' => '9876543210',
+            'source' => 'recommended_seller_contact',
+            'intent' => 'seller_contact',
+        ]);
+
+        $this->assertDatabaseHas('b2_c_leads', [
+            'id' => $leadId,
+            'name' => 'Repeat Buyer',
+            'phone' => '9876543210',
+            'city' => 'Thane',
+            'configuration' => 'seller_contact',
+            'status' => 'shared',
+        ]);
+
+        $this->assertDatabaseHas('b2_c_lead_shares', [
+            'b2_c_lead_id' => $leadId,
+            'partner_id' => $partner->id,
+        ]);
     }
 
     /**

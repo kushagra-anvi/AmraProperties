@@ -1,7 +1,7 @@
 @extends('layouts.site')
 
 @section('title', 'Contact Us - Amra Property')
-@section('meta_description', 'Get in touch with Amra Property. Contact our agents for premium Powai flats and Lucknow villas.')
+@section('meta_description', 'Get in touch with Amra Property for verified flats, villas, plots and commercial properties across leading cities.')
 
 @section('content')
     <div class="pt-20 pb-10 sm:pt-24 sm:pb-20 relative">
