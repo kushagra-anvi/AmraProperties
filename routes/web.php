@@ -7,6 +7,7 @@ use App\Http\Controllers\B2CLeadController;
 use App\Http\Controllers\B2CLeadImportController;
 use App\Http\Controllers\ContactFormController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\PartnerImportController;
 use App\Http\Controllers\PropertyEnquiryController;
@@ -18,7 +19,6 @@ use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CRM\PropertyAdminController;
 use App\Models\BlogPost;
-use App\Models\Partner;
 use App\Models\Property;
 use App\Support\SeoMeta;
 use Illuminate\Support\Facades\Response;
@@ -29,42 +29,7 @@ use Illuminate\Support\Facades\Response;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    $featuredProperties = \App\Models\Property::with('configurations')->where('status', 'publish')
-        ->where('is_featured', true)
-        ->latest()
-        ->take(6)
-        ->get();
-    $recommendedSellers = Partner::where('is_active', true)
-        ->whereIn('type', ['agent', 'developer'])
-        ->withCount(['properties as total_listings'])
-        ->orderByDesc('total_listings')
-        ->limit(8)
-        ->get()
-        ->sortByDesc(fn (Partner $partner) => [
-            'free' => 0,
-            'starter' => 10,
-            'growth' => 20,
-            'premium' => 30,
-            'customise' => 30,
-        ][$partner->package] ?? 0)
-        ->values();
-    $seo = SeoMeta::staticPage('home', route('site.home'));
-
-    $locations = \App\Models\Property::where('status', 'publish')
-        ->whereNotNull('city')
-        ->where('city', '!=', '')
-        ->distinct()
-        ->pluck('city')
-        ->all();
-    $latestPosts = BlogPost::where('status', 'publish')
-        ->latest('published_at')
-        ->latest()
-        ->take(3)
-        ->get();
-
-    return view('site.home', compact('featuredProperties', 'recommendedSellers', 'seo', 'locations', 'latestPosts'));
-})->name('site.home');
+Route::get('/', [HomeController::class, 'index'])->name('site.home');
 
 Route::get('/about-us', function () {
     return view('site.about', ['seo' => SeoMeta::staticPage('about', route('site.about'))]);
