@@ -360,6 +360,40 @@ class PropertyTest extends TestCase
         ]);
     }
 
+    public function test_homepage_helpful_links_only_include_searches_with_results(): void
+    {
+        $luxury = PropertyTag::where('slug', 'luxury')->firstOrFail();
+
+        $property = Property::create([
+            'title' => 'Mumbai 2BHK Luxury Flat',
+            'slug' => 'mumbai-2bhk-luxury-flat',
+            'description' => 'A published property that should back homepage links.',
+            'price' => 9000000,
+            'city' => 'Mumbai',
+            'status' => 'publish',
+            'listing_type' => 'sale',
+            'configuration' => '2BHK Flat',
+        ]);
+        $property->tags()->attach($luxury);
+
+        $response = $this->get('/');
+
+        $response->assertOk()
+            ->assertSee('Flats to buy in Mumbai')
+            ->assertSee('2 BHK flats')
+            ->assertSee('Luxury')
+            ->assertDontSee('3 BHK flats')
+            ->assertDontSee('RERA approved projects');
+
+        $this->get('/property?listing_type=sale&type=flat&location=Mumbai')
+            ->assertOk()
+            ->assertSee('Mumbai 2BHK Luxury Flat');
+
+        $this->get('/property?q=2BHK')
+            ->assertOk()
+            ->assertSee('Mumbai 2BHK Luxury Flat');
+    }
+
     /**
      * Test single property details page renders successfully.
      */

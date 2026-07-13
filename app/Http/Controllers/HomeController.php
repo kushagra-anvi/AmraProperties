@@ -65,9 +65,9 @@ class HomeController extends Controller
             ->get();
 
         $cityLinks = $this->cityLinks($publishedProperties);
-        $tagLinks = $this->tagLinks();
+        $tagLinks = $this->tagLinks($publishedProperties);
         $projectLinks = $this->projectLinks($tagLinks);
-        $popularSearchLinks = $this->popularSearchLinks($tagLinks);
+        $popularSearchLinks = $this->popularSearchLinks($publishedProperties, $tagLinks);
 
         return collect([
             'buyers' => [
@@ -147,9 +147,20 @@ class HomeController extends Controller
             ->all();
     }
 
-    private function tagLinks(): array
+    private function tagLinks(Collection $publishedProperties): array
     {
+        $attachedTagSlugs = $publishedProperties
+            ->flatMap(fn (Property $property) => $property->tags->pluck('slug'))
+            ->filter()
+            ->unique()
+            ->values();
+
+        if ($attachedTagSlugs->isEmpty()) {
+            return [];
+        }
+
         return PropertyTag::where('is_active', true)
+            ->whereIn('slug', $attachedTagSlugs)
             ->whereHas('properties', fn ($query) => $query->where('status', 'publish'))
             ->withCount(['properties as published_properties_count' => fn ($query) => $query->where('status', 'publish')])
             ->orderByDesc('published_properties_count')
@@ -166,33 +177,39 @@ class HomeController extends Controller
     private function projectLinks(array $tagLinks): array
     {
         $projectTagSlugs = ['new-launch', 'rera-approved', 'premium-builder', 'under-construction', 'possession-soon', 'luxury', 'affordable', 'investment'];
-        $projectLinks = collect($tagLinks)
+        return collect($tagLinks)
             ->filter(fn (array $link) => in_array(Str::slug($link['label']), $projectTagSlugs, true))
             ->values()
             ->all();
-
-        if (count($projectLinks) >= 4) {
-            return $projectLinks;
-        }
-
-        return array_merge($projectLinks, collect([
-            ['label' => 'RERA approved projects', 'url' => route('site.property', ['tag' => 'rera-approved'])],
-            ['label' => 'New launch projects', 'url' => route('site.property', ['tag' => 'new-launch'])],
-            ['label' => 'Under construction projects', 'url' => route('site.property', ['tag' => 'under-construction'])],
-            ['label' => 'Ready to move projects', 'url' => route('site.property', ['tag' => 'ready-to-move'])],
-        ])->reject(fn (array $fallback) => collect($projectLinks)->contains('url', $fallback['url']))->all());
     }
 
-    private function popularSearchLinks(array $tagLinks): array
+    private function popularSearchLinks(Collection $publishedProperties, array $tagLinks): array
     {
+        $configurationLinks = $publishedProperties
+            ->flatMap(function (Property $property) {
+                $haystack = strtolower(trim(($property->configuration ?? '') . ' ' . ($property->title ?? '')));
+
+                preg_match_all('/(\d+)\s*bhk/i', $haystack, $matches);
+
+                return collect($matches[1] ?? [])
+                    ->unique()
+                    ->map(fn (string $bedrooms) => (int) $bedrooms);
+            })
+            ->filter()
+            ->countBy()
+            ->sortDesc()
+            ->keys()
+            ->take(4)
+            ->map(fn (int $bedrooms) => [
+                'label' => "{$bedrooms} BHK flats",
+                'url' => route('site.property', ['q' => "{$bedrooms}BHK"]),
+            ])
+            ->all();
+
         return collect($tagLinks)
             ->take(6)
-            ->merge([
-                ['label' => '1 BHK flats', 'url' => route('site.property', ['q' => '1BHK'])],
-                ['label' => '2 BHK flats', 'url' => route('site.property', ['q' => '2BHK'])],
-                ['label' => '3 BHK flats', 'url' => route('site.property', ['q' => '3BHK'])],
-                ['label' => 'All properties', 'url' => route('site.property')],
-            ])
+            ->merge($configurationLinks)
+            ->when($publishedProperties->isNotEmpty(), fn (Collection $links) => $links->push(['label' => 'All properties', 'url' => route('site.property')]))
             ->unique('url')
             ->take(10)
             ->values()
