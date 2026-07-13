@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Property;
 use App\Models\Partner;
+use App\Support\PropertyLinkTabs;
 use App\Support\SeoMeta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -178,8 +179,9 @@ class PropertyController extends Controller
             ->all();
 
         $seo = SeoMeta::propertyIndex($request, route('site.property'));
+        $propertyLinkTabs = app(PropertyLinkTabs::class)->build();
 
-        return view('site.property', compact('properties', 'seo', 'locations'));
+        return view('site.property', compact('properties', 'seo', 'locations', 'propertyLinkTabs'));
     }
 
     /**

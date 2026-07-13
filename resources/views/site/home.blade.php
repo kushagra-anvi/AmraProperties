@@ -680,41 +680,10 @@
         </section>
     @endif
 
-    <!-- Helpful Property Links -->
-    <section class="bg-white border-y border-slate-100">
-        <div class="max-w-7xl mx-auto px-4 md:px-6">
-            <div class="overflow-x-auto border-b border-slate-200">
-                <div class="flex min-w-max justify-between gap-3 md:gap-8">
-                    @foreach($propertyLinkTabs as $tabKey => $tab)
-                        <button type="button"
-                            class="home-link-tab relative px-4 py-5 text-xs sm:text-sm font-bold uppercase tracking-wide {{ $loop->first ? 'text-slate-950' : 'text-slate-500' }} transition-colors hover:text-slate-950 md:flex-1"
-                            data-target="property-links-{{ $tabKey }}"
-                            aria-controls="property-links-{{ $tabKey }}"
-                            aria-selected="{{ $loop->first ? 'true' : 'false' }}">
-                            {{ $tab['label'] }}
-                            <span class="home-link-tab-line absolute inset-x-0 bottom-0 h-0.5 bg-amra-primary {{ $loop->first ? '' : 'hidden' }}"></span>
-                        </button>
-                    @endforeach
-                </div>
-            </div>
-
-            <div class="py-7 sm:py-8">
-                @foreach($propertyLinkTabs as $tabKey => $tab)
-                    <div id="property-links-{{ $tabKey }}" class="home-link-panel {{ $loop->first ? '' : 'hidden' }}">
-                        <h2 class="text-base sm:text-lg font-extrabold text-slate-950 mb-5">{{ $tab['heading'] }}</h2>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-3">
-                            @foreach($tab['links'] as $link)
-                                <a href="{{ $link['url'] }}" class="group flex items-center justify-between gap-3 text-sm font-semibold text-slate-600 hover:text-amra-primary transition-colors">
-                                    <span>{{ $link['label'] }}</span>
-                                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-300 group-hover:text-amra-primary transition-colors"></i>
-                                </a>
-                            @endforeach
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    </section>
+    @include('site.partials.property-links', [
+        'tabs' => $propertyLinkTabs,
+        'sectionId' => 'home-property-links',
+    ])
 
     <!-- CTA Section -->
     <section class="bg-white border-b border-slate-100 py-6 sm:py-8">
@@ -1179,24 +1148,6 @@
                 window.location.href = `{{ route('site.property') }}${queryString ? `?${queryString}` : ''}`;
             });
         }
-
-        document.querySelectorAll('.home-link-tab').forEach((tab) => {
-            tab.addEventListener('click', () => {
-                const targetId = tab.dataset.target;
-
-                document.querySelectorAll('.home-link-tab').forEach((button) => {
-                    const isActive = button === tab;
-                    button.setAttribute('aria-selected', isActive ? 'true' : 'false');
-                    button.classList.toggle('text-slate-950', isActive);
-                    button.classList.toggle('text-slate-500', !isActive);
-                    button.querySelector('.home-link-tab-line')?.classList.toggle('hidden', !isActive);
-                });
-
-                document.querySelectorAll('.home-link-panel').forEach((panel) => {
-                    panel.classList.toggle('hidden', panel.id !== targetId);
-                });
-            });
-        });
 
         const calculatorModal = document.getElementById('calculator-modal');
         const calculatorClose = document.getElementById('calculator-close');

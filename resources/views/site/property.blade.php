@@ -221,6 +221,12 @@
             <!-- Pagination Controls -->
             {{ $properties->links('components.pagination') }}
 
+            @include('site.partials.property-links', [
+                'tabs' => $propertyLinkTabs,
+                'sectionId' => 'property-page-links',
+                'variant' => 'embedded',
+            ])
+
             <div id="compare-bar" class="fixed bottom-5 z-50 hidden rounded-2xl bg-slate-950 text-white shadow-2xl border border-white/10 px-4 py-3 items-center gap-4" style="left: 0; right: 0; margin-left: auto; margin-right: auto; width: fit-content;">
                 <span id="compare-count" class="text-xs font-bold">0 selected</span>
                 <button type="button" id="compare-open" class="bg-amra-primary text-slate-950 px-4 py-2 rounded-xl text-xs font-extrabold">Compare</button>
