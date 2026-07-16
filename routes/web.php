@@ -237,6 +237,10 @@ Route::middleware('auth')->prefix('crm')->group(function () {
 
         Route::get('/property-enquiries', [PropertyEnquiryController::class, 'index'])->name('crm.property-enquiries.index');
 
+        // Tata Call Logs / Dispositions
+        Route::get('/tata-logs', [App\Http\Controllers\CRM\TataCallLogController::class, 'index'])->name('crm.tata-logs.index');
+        Route::post('/tata-logs/{log}/disposition', [App\Http\Controllers\CRM\TataCallLogController::class, 'updateDisposition'])->name('crm.tata-logs.disposition');
+
         // Properties CRUD
         Route::resource('properties', PropertyAdminController::class)->names([
             'index' => 'crm.properties.index',
