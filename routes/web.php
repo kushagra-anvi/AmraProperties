@@ -142,6 +142,13 @@ Route::get('/pages/{page}.html', function (string $page) {
 // Organic Contact Form submission
 Route::post('/contact', [ContactFormController::class, 'submit'])->name('contact.submit');
 
+// Tata Smartflo Webhook
+Route::any('/webhooks/smartflo', App\Http\Controllers\Webhook\TataWebhookController::class)->name('webhook.smartflo');
+
+// Tata Smartflo API Dialplan Routing
+Route::any('/webhooks/smartflo/route', App\Http\Controllers\Webhook\TataDialplanController::class)->name('webhook.smartflo.route');
+
+
 
 /*
 |--------------------------------------------------------------------------

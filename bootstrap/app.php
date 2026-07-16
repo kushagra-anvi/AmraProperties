@@ -16,6 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->validateCsrfTokens(except: [
             '/contact',
+            '/webhooks/smartflo',
+            '/webhooks/smartflo/route',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

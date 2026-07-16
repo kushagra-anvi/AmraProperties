@@ -39,4 +39,11 @@ return [
         'key' => env('GOOGLE_MAPS_API_KEY'),
     ],
 
+    'smartflo' => [
+        'api_key' => env('TTBS_API_KEY'),
+        'click_to_call_api_key' => env('TTBS_CLICK_TO_CALL_API_KEY'),
+        'webhook_secret' => env('TTBS_WEBHOOK_SECRET', 'smartflo_secure_token_123'),
+        'did_number' => env('TATA_DID_NUMBER'),
+    ],
+
 ];
