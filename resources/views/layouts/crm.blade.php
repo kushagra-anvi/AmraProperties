@@ -465,6 +465,76 @@
                     }
                 });
             }
+
+            // Global Click to Call function
+            window.initiateClickToCall = async function(phoneNumber) {
+                if (!phoneNumber) {
+                    alert('No phone number provided.');
+                    return;
+                }
+
+                const toast = document.createElement('div');
+                toast.className = 'fixed top-6 right-6 z-50 max-w-sm bg-slate-900 border border-slate-800 text-white px-5 py-4 rounded-2xl flex items-center gap-3 shadow-2xl backdrop-blur-md';
+                toast.innerHTML = `
+                    <i data-lucide="phone-call" class="w-5 h-5 text-teal-400 shrink-0 animate-pulse"></i>
+                    <div class="text-xs">
+                        <span class="font-bold">Connecting...</span> Initiating call to +91 ${phoneNumber}.
+                    </div>
+                `;
+                document.body.appendChild(toast);
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+
+                try {
+                    const response = await fetch('/crm/click-to-call', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ phone: phoneNumber })
+                    });
+
+                    const result = await response.json();
+                    toast.remove();
+
+                    const outcomeToast = document.createElement('div');
+                    if (response.ok && result.status === 'success') {
+                        outcomeToast.className = 'fixed top-6 right-6 z-50 max-w-sm bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 px-4 py-3 rounded-xl flex items-start gap-3 shadow-lg backdrop-blur-md';
+                        outcomeToast.innerHTML = `
+                            <i data-lucide="check-circle" class="w-5 h-5 text-emerald-500 shrink-0"></i>
+                            <div class="text-xs">
+                                <span class="font-bold">Call Initiated!</span> ${result.message}
+                            </div>
+                        `;
+                    } else {
+                        outcomeToast.className = 'fixed top-6 right-6 z-50 max-w-sm bg-rose-500/15 border border-rose-500/30 text-rose-400 px-4 py-3 rounded-xl flex items-start gap-3 shadow-lg backdrop-blur-md';
+                        outcomeToast.innerHTML = `
+                            <i data-lucide="alert-circle" class="w-5 h-5 text-rose-500 shrink-0"></i>
+                            <div class="text-xs">
+                                <span class="font-bold">Failed to connect:</span> ${result.message || 'Telephony error.'}
+                            </div>
+                        `;
+                    }
+                    
+                    document.body.appendChild(outcomeToast);
+                    if (window.lucide) {
+                        window.lucide.createIcons();
+                    }
+
+                    setTimeout(() => {
+                        outcomeToast.classList.add('transition-opacity', 'duration-500', 'opacity-0');
+                        setTimeout(() => outcomeToast.remove(), 500);
+                    }, 4000);
+
+                } catch (error) {
+                    console.error('Click-to-call error:', error);
+                    toast.remove();
+                    alert('Connection to server failed.');
+                }
+            };
         });
     </script>
     @yield('scripts')

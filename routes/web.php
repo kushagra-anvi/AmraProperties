@@ -212,6 +212,8 @@ Route::middleware('auth')->prefix('crm')->group(function () {
                 'new_count' => $afterCount - $beforeCount
             ]);
         })->name('crm.tata-logs.sync');
+
+        Route::post('/click-to-call', App\Http\Controllers\CRM\TataClickToCallController::class)->name('crm.click-to-call');
     });
 
     // B2C distribution and partner management

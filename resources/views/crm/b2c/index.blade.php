@@ -322,6 +322,9 @@
                                 </div>
                                 <div class="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
                                     <span>{{ $lead->phone }}</span>
+                                    <button onclick="initiateClickToCall('{{ $lead->phone }}')" class="text-teal-400 hover:text-teal-350 transition-colors p-0.5" title="Initiate Call">
+                                        <i data-lucide="phone-call" class="w-3.5 h-3.5"></i>
+                                    </button>
                                     @if ($lead->email)
                                         <span class="text-slate-600">•</span>
                                         <span class="truncate max-w-xs">{{ $lead->email }}</span>

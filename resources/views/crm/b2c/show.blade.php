@@ -29,6 +29,9 @@
                     <h1 class="text-2xl md:text-3xl font-serif font-extrabold text-white">{{ $lead->name }}</h1>
                     <p class="text-sm text-slate-400 mt-1 flex items-center gap-1.5">
                         <i data-lucide="phone" class="w-4 h-4 text-slate-500"></i> Phone Contact: <strong class="text-slate-350 font-semibold">{{ $lead->phone }}</strong>
+                        <button onclick="initiateClickToCall('{{ $lead->phone }}')" class="inline-flex items-center justify-center p-1 rounded-md bg-teal-500/10 text-teal-400 hover:bg-teal-500 hover:text-white transition-all ml-1.5" title="Click to Call">
+                            <i data-lucide="phone-call" class="w-3.5 h-3.5"></i>
+                        </button>
                     </p>
                     <div class="flex items-center gap-4 mt-3 text-xs text-slate-500">
                         <span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> {{ $lead->city }}</span>

@@ -69,14 +69,24 @@
                 <div class="grid gap-6 sm:grid-cols-2">
                     <div class="space-y-1">
                         <span class="text-[10px] font-bold text-slate-500 uppercase">Contact Number</span>
-                        <a href="tel:{{ $lead->contact_number }}" class="text-sm font-semibold text-white block hover:text-amra-primary">{{ $lead->contact_number }}</a>
+                        <div class="flex items-center gap-2">
+                            <a href="tel:{{ $lead->contact_number }}" class="text-sm font-semibold text-white block hover:text-amra-primary">{{ $lead->contact_number }}</a>
+                            <button onclick="initiateClickToCall('{{ $lead->contact_number }}')" class="inline-flex items-center justify-center p-1 rounded-md bg-teal-500/10 text-teal-400 hover:bg-teal-500 hover:text-white transition-all" title="Click to Call">
+                                <i data-lucide="phone-call" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="space-y-1">
                         <span class="text-[10px] font-bold text-slate-500 uppercase">WhatsApp Number</span>
                         @if ($lead->whatsapp_number)
-                            <a href="https://wa.me/{{ preg_replace('/\D/', '', $lead->whatsapp_number) }}" target="_blank" class="text-sm font-semibold text-emerald-400 hover:underline flex items-center gap-1.5">
-                                <i data-lucide="message-square" class="w-4 h-4"></i> {{ $lead->whatsapp_number }}
-                            </a>
+                            <div class="flex items-center gap-2">
+                                <a href="https://wa.me/{{ preg_replace('/\D/', '', $lead->whatsapp_number) }}" target="_blank" class="text-sm font-semibold text-emerald-450 hover:underline flex items-center gap-1.5">
+                                    <i data-lucide="message-square" class="w-4 h-4"></i> {{ $lead->whatsapp_number }}
+                                </a>
+                                <button onclick="initiateClickToCall('{{ $lead->whatsapp_number }}')" class="inline-flex items-center justify-center p-1 rounded-md bg-teal-500/10 text-teal-400 hover:bg-teal-500 hover:text-white transition-all" title="Click to Call">
+                                    <i data-lucide="phone-call" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
                         @else
                             <span class="text-xs text-slate-650 italic">None Provided</span>
                         @endif
