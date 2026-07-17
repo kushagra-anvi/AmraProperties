@@ -43,7 +43,7 @@
                                 </a>
                             </h3>
                             <p class="text-xs text-gray-500 leading-relaxed line-clamp-3 mb-4">
-                                {{ Str::limit(strip_tags($post->content), 120) }}
+                                {{ $post->excerpt(120) }}
                             </p>
                         </div>
                     </div>

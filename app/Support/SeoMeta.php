@@ -116,7 +116,7 @@ class SeoMeta
     public static function blog(BlogPost $post, string $url): array
     {
         $title = html_entity_decode($post->title) . ' - Amra Property';
-        $description = Str::limit(trim(strip_tags((string) $post->content)), 155);
+        $description = $post->excerpt(155);
         $image = self::assetUrl($post->featured_image);
 
         return self::make([

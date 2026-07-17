@@ -663,7 +663,7 @@
                                         {{ $post->title }}
                                     </h3>
                                     <p class="mt-3 line-clamp-3 text-sm leading-relaxed text-slate-500">
-                                        {{ Str::limit(strip_tags($post->content), 130) }}
+                                        {{ $post->excerpt(130) }}
                                     </p>
                                     <div class="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
                                         <span class="text-[11px] font-extrabold uppercase tracking-wider text-amra-primary">Read Article</span>
