@@ -199,6 +199,10 @@ Route::middleware('auth')->prefix('crm')->group(function () {
         Route::post('/b2b/{lead}/status', [B2BLeadController::class, 'updateStatus'])->name('crm.b2b.status');
         Route::post('/b2b/{lead}/assign', [B2BLeadController::class, 'assign'])->name('crm.b2b.assign');
         Route::post('/b2b/{lead}/followup', [B2BLeadController::class, 'logFollowUp'])->name('crm.b2b.followup');
+
+        // Tata Call Logs / Dispositions
+        Route::get('/tata-logs', [App\Http\Controllers\CRM\TataCallLogController::class, 'index'])->name('crm.tata-logs.index');
+        Route::post('/tata-logs/{log}/disposition', [App\Http\Controllers\CRM\TataCallLogController::class, 'updateDisposition'])->name('crm.tata-logs.disposition');
     });
 
     // B2C distribution and partner management
@@ -236,10 +240,6 @@ Route::middleware('auth')->prefix('crm')->group(function () {
         Route::put('/partners/{partner}', [PartnerController::class, 'update'])->name('crm.partners.update');
 
         Route::get('/property-enquiries', [PropertyEnquiryController::class, 'index'])->name('crm.property-enquiries.index');
-
-        // Tata Call Logs / Dispositions
-        Route::get('/tata-logs', [App\Http\Controllers\CRM\TataCallLogController::class, 'index'])->name('crm.tata-logs.index');
-        Route::post('/tata-logs/{log}/disposition', [App\Http\Controllers\CRM\TataCallLogController::class, 'updateDisposition'])->name('crm.tata-logs.disposition');
 
         // Properties CRUD
         Route::resource('properties', PropertyAdminController::class)->names([
