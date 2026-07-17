@@ -203,8 +203,14 @@ Route::middleware('auth')->prefix('crm')->group(function () {
         Route::get('/tata-logs', [App\Http\Controllers\CRM\TataCallLogController::class, 'index'])->name('crm.tata-logs.index');
         Route::post('/tata-logs/{log}/disposition', [App\Http\Controllers\CRM\TataCallLogController::class, 'updateDisposition'])->name('crm.tata-logs.disposition');
         Route::post('/tata-logs/sync', function () {
+            $beforeCount = \App\Models\TataCallLog::count();
             \Illuminate\Support\Facades\Artisan::call('tata:sync-logs');
-            return response()->json(['status' => 'success', 'message' => 'Call logs synced successfully.']);
+            $afterCount = \App\Models\TataCallLog::count();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Call logs synced successfully.',
+                'new_count' => $afterCount - $beforeCount
+            ]);
         })->name('crm.tata-logs.sync');
     });
 

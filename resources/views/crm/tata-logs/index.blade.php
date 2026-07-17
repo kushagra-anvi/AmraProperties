@@ -277,5 +277,33 @@
             text.innerText = 'Sync Calls';
         }
     }
+
+    // Silent sync helper
+    async function silentSync() {
+        try {
+            const response = await fetch('/crm/tata-logs/sync', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            });
+            const result = await response.json();
+            if (result.status === 'success' && result.new_count > 0) {
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error('Silent sync error:', error);
+        }
+    }
+
+    // Auto sync on load and every 10 seconds in background
+    document.addEventListener('DOMContentLoaded', () => {
+        // Run silent sync immediately on load
+        silentSync();
+
+        // Poll every 10 seconds
+        setInterval(silentSync, 10000);
+    });
 </script>
 @endsection
