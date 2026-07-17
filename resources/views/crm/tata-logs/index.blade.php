@@ -12,6 +12,12 @@
             <h1 class="text-3xl font-serif font-extrabold text-amra-dark">Tata Call Logs & Dispositions</h1>
             <p class="text-sm text-slate-500">Track all incoming and outgoing calls, listen to audio recordings, and manage call dispositions.</p>
         </div>
+        <div>
+            <button id="sync-now-btn" onclick="syncCallLogs()" class="inline-flex items-center gap-2 bg-amra-primary hover:bg-amra-primary/95 text-white font-bold text-xs px-5 py-3.5 rounded-xl transition-all shadow-sm">
+                <i data-lucide="refresh-cw" class="w-4 h-4" id="sync-icon"></i>
+                <span id="sync-text">Sync Calls</span>
+            </button>
+        </div>
     </div>
 
     <!-- Filters Section -->
@@ -234,6 +240,42 @@
         setTimeout(() => {
             badge.classList.add('hidden');
         }, 1500);
+    }
+
+    async function syncCallLogs() {
+        const btn = document.getElementById('sync-now-btn');
+        const icon = document.getElementById('sync-icon');
+        const text = document.getElementById('sync-text');
+
+        // Loading state
+        btn.disabled = true;
+        btn.classList.add('opacity-75', 'cursor-not-allowed');
+        icon.classList.add('animate-spin');
+        text.innerText = 'Syncing...';
+
+        try {
+            const response = await fetch('/crm/tata-logs/sync', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            });
+            const result = await response.json();
+            if (result.status === 'success') {
+                window.location.reload();
+            } else {
+                alert('Sync failed. Please try again.');
+            }
+        } catch (error) {
+            console.error('Sync failed:', error);
+            alert('Failed to connect to the server.');
+        } finally {
+            btn.disabled = false;
+            btn.classList.remove('opacity-75', 'cursor-not-allowed');
+            icon.classList.remove('animate-spin');
+            text.innerText = 'Sync Calls';
+        }
     }
 </script>
 @endsection

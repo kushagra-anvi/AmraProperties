@@ -8,5 +8,5 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 use Illuminate\Support\Facades\Schedule;
-Schedule::command('tata:sync-logs')->everyFifteenMinutes();
+Schedule::command('tata:sync-logs')->everyMinute();
 

@@ -200,9 +200,12 @@ Route::middleware('auth')->prefix('crm')->group(function () {
         Route::post('/b2b/{lead}/assign', [B2BLeadController::class, 'assign'])->name('crm.b2b.assign');
         Route::post('/b2b/{lead}/followup', [B2BLeadController::class, 'logFollowUp'])->name('crm.b2b.followup');
 
-        // Tata Call Logs / Dispositions
         Route::get('/tata-logs', [App\Http\Controllers\CRM\TataCallLogController::class, 'index'])->name('crm.tata-logs.index');
         Route::post('/tata-logs/{log}/disposition', [App\Http\Controllers\CRM\TataCallLogController::class, 'updateDisposition'])->name('crm.tata-logs.disposition');
+        Route::post('/tata-logs/sync', function () {
+            \Illuminate\Support\Facades\Artisan::call('tata:sync-logs');
+            return response()->json(['status' => 'success', 'message' => 'Call logs synced successfully.']);
+        })->name('crm.tata-logs.sync');
     });
 
     // B2C distribution and partner management
